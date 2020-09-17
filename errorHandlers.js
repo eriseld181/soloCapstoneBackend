@@ -4,6 +4,12 @@ const badRequest = (error, req, res, next) => {
     }
     next(error)
 }
+const notAuthorized = (error, req, res, next) => {
+    if (error.httpStatusCode === 401) {
+        res.status(401).send(error.message || "You are not authorized, please contact admin!")
+    }
+    next(error)
+}
 const forbidden = (error, req, res, next) => {
     if (error.httpStatusCode === 403) {
         res.status(403).send(error.message || "You are forbidden, please contact admin!")
@@ -22,6 +28,7 @@ const generalError = (error, req, res, next) => {
 }
 module.exports = {
     badRequest,
+    notAuthorized,
     forbidden,
     notFound,
     generalError
