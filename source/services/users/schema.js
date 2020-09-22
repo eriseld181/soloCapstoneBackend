@@ -23,6 +23,7 @@ userSchema = new Schema(
         grades: { type: Number, default: 0, min: 0, max: 10 },
         registerdate: { type: Date, default: Date.now },
         role: { type: String, enum: ["tutor", "student"], required: true, },
+        projects: [{ type: Schema.Types.ObjectId, ref: 'projects' }]
 
     },
     { timestamps: true }
