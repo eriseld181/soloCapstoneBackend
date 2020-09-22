@@ -19,6 +19,7 @@
   "homepage": "https://github.com/eriseld181/soloCapstoneBackend#readme",
   "dependencies": {
     "atob": "^2.1.2",
+    "bcrypt": "^5.0.0",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
