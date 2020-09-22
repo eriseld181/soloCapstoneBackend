@@ -16,11 +16,13 @@ server.use(express.json())
 server.use("/api/users", userRouter)
 
 
-mongoose.connect(process.env.CONNECTION_DATABASE, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useCreateIndex: true,
-})
+mongoose
+    .connect(process.env.CONNECTION_DATABASE, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        useCreateIndex: true,
+    })
+
     .then(
         server.listen(port, () => {
             console.log("The server is running on port", port)

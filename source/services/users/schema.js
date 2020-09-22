@@ -23,7 +23,15 @@ userSchema = new Schema(
         grades: { type: Number, default: 0, min: 0, max: 10 },
         registerdate: { type: Date, default: Date.now },
         role: { type: String, enum: ["tutor", "student"], required: true, },
-        projects: [{ type: Schema.Types.ObjectId, ref: 'projects' }]
+        projects: [{ type: Schema.Types.ObjectId, ref: 'projects' }],
+        refreshTokens: [
+            {
+                token: {
+                    type: String,
+                    required: true,
+                },
+            },
+        ],
 
     },
     { timestamps: true }
@@ -38,9 +46,11 @@ userSchema.methods.toJSON = function () {
     delete userObject.__v
     return userObject
 }
-userSchema.statics.findByCredetials = async (email, password) => {
+userSchema.statics.findByCredentials = async (email, password) => {
     const user = await UserModel.findOne({ email })
+    console.log("aleski11", user)
     const isMatch = await bcrypt.compare(password, user.password)
+    console.log("aleski", isMatch)
     if (!isMatch) {
         const error = new Error("Unable to login, please try again!")
         error.httpStatusCode = 401

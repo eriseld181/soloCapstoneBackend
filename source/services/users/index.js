@@ -1,7 +1,7 @@
 const express = require('express')
 const q2m = require('query-to-mongo')
-
-
+const passport = require("passport")
+const { authenticate, refreshToken } = require("./authentication")
 const UserModel = require('./schema')
 const userRouter = express.Router()
 
@@ -15,6 +15,31 @@ userRouter.post("/register", async (req, res, next) => {
     } catch (error) {
         next(error)
 
+    }
+})
+//login with actual user
+userRouter.post("/login", async (req, res, next) => {
+    try {
+        const { email, password } = req.body
+
+        const user = await UserModel.findByCredentials(email, password)
+        console.log("this is user", user)
+
+        const { token, refreshToken } = await authenticate(user)
+        console.log("this is token", token, refreshToken)
+        res.cookie("accessToken", token, {
+            path: "/",
+            httpOnly: true,
+            sameSite: true,
+        })
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            sameSite: true,
+        })
+        res.send({ token, refreshToken })
+    } catch (error) {
+        console.log(error)
+        next(error)
     }
 })
 
@@ -38,4 +63,15 @@ userRouter.get("/", async (req, res, next) => {
         next(error)
     }
 })
+
+userRouter.get("/me", async (req, res, next) => {
+    try {
+        res.send(req.user)
+        console.log(req.user)
+        next("While reading users list a problem occurred!")
+    } catch (error) {
+
+    }
+})
+
 module.exports = userRouter
