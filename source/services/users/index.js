@@ -4,7 +4,7 @@ const passport = require("passport")
 const { authenticate, refreshToken } = require("./authentication")
 const UserModel = require('./schema')
 const userRouter = express.Router()
-
+const { authorize, tutorOnlyMiddleware } = require("../middlewares/authorize")
 //Register a new user
 userRouter.post("/register", async (req, res, next) => {
     try {
@@ -25,27 +25,23 @@ userRouter.post("/login", async (req, res, next) => {
         const user = await UserModel.findByCredentials(email, password)
         console.log("this is user", user)
 
-        const { token, refreshToken } = await authenticate(user)
-        console.log("this is token", token, refreshToken)
+        const token = await authenticate(user)
         res.cookie("accessToken", token, {
-            path: "/",
+            secure: true,
             httpOnly: true,
-            sameSite: true,
+            sameSite: "none",
         })
-        res.cookie("refreshToken", refreshToken, {
-            httpOnly: true,
-            sameSite: true,
-        })
-        res.send({ token, refreshToken })
+
+
+        res.send({ token })
     } catch (error) {
-        console.log(error)
         next(error)
     }
 })
 
 
 //Get all Tutors and Students
-userRouter.get("/", async (req, res, next) => {
+userRouter.get("/", authorize, async (req, res, next) => {
     try {
         const query = q2m(req.query)
 
@@ -73,5 +69,7 @@ userRouter.get("/me", async (req, res, next) => {
 
     }
 })
+
+
 
 module.exports = userRouter

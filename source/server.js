@@ -4,18 +4,46 @@ const { join } = require("path")
 const listEndPoints = require('express-list-endpoints')
 const mongoose = require('mongoose')
 const userRouter = require('./services/users')
+const cookieParser = require("cookie-parser")
 
+const {
+    badRequest,
+    notAuthorized,
+    forbidden,
+    notFound,
+    generalError
+} = require("../errorHandlers")
 
 const server = express()
-
+const whitelist = ["http://localhost:3000"]
+const corsOptions = {
+    origin: (origin, callback) => {
+        if (whitelist.indexOf(origin) !== -1 || !origin) {
+            callback(null, true)
+        } else {
+            callback(new Error("Not allowed by CORS"))
+        }
+    },
+    credentials: true,
+}
+server.use(cookieParser())
 const port = process.env.PORT
 
-
+server.use(cors(corsOptions))
+const staticFolderPath = join(__dirname, "../public")
+server.use(express.static(staticFolderPath))
 server.use(express.json())
 
 server.use("/api/users", userRouter)
 
+//error handlers
+server.use(badRequest)
+server.use(notAuthorized)
+server.use(forbidden)
+server.use(notFound)
+server.use(generalError)
 
+console.log(listEndPoints(server))
 mongoose
     .connect(process.env.CONNECTION_DATABASE, {
         useNewUrlParser: true,
