@@ -1,19 +1,19 @@
 const jwt = require("jsonwebtoken")
 const User = require("./schema")
 
-const refreshToken = async (oldRefreshToken) => {
+const checkRefreshToken = async (oldRefreshToken) => {
     const decoded = await verifyRefreshToken(oldRefreshToken)
     const user = await User.findOne({ _id: decoded._id })
 
     if (!user)
-        throw new Error('Access is forbidden!')
+        throw new Error("Access is forbidden, token is invalid or expired!")
 
 
     const currentRefreshToken = user.refreshTokens.find(
         (token) => token.token === oldRefreshToken)
 
     if (!currentRefreshToken) {
-        throw new error(`refresh token is wrong!`)
+        throw new error("refresh token is not available!")
     }
 
     //generate tokens
@@ -29,7 +29,7 @@ const refreshToken = async (oldRefreshToken) => {
     await user.save()
     return { token: newAccessToken, refreshToken: newRefreshToken }
 }
-
+//I create this function to pass the user in here, it takes the _id to generate the token
 const authenticate = async (user) => {
     try {
         // generate tokens
@@ -45,23 +45,20 @@ const authenticate = async (user) => {
         throw new Error(error)
     }
 }
-
+// first step is to generate the token
 const generateJWT = (payload) =>
     new Promise((res, rej) =>
         jwt.sign(
             payload,
             process.env.JWT_SECRET,
-            { expiresIn: 604800 },
+            { expiresIn: 60 },
             (error, token) => {
                 if (error) rej(error)
                 res(token)
             }
         )
     )
-
-
-
-
+//second step is to verify the token
 const verifyJWT = (token) =>
     new Promise((res, rej) =>
         jwt.verify(
@@ -90,4 +87,4 @@ const verifyRefreshToken = (token) =>
                 res(decoded)
             }
         ))
-module.exports = { authenticate, verifyJWT, refreshToken }
+module.exports = { authenticate, verifyJWT, checkRefreshToken }

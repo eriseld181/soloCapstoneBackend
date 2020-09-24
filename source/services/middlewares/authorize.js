@@ -4,12 +4,10 @@ const { verifyJWT } = require("../users/authentication")
 
 const authorize = async (req, res, next) => {
     try {
-        console.log(req.cookies.accessToken)
-        //This is not coming
         const token = req.cookies.accessToken
 
         const decoded = await verifyJWT(token)
-        console.log(decoded)
+
         const user = await userModel.findOne({ _id: decoded._id })
 
         if (!user) { throw new Error() }

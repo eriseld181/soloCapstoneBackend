@@ -1,7 +1,7 @@
 const express = require('express')
 const q2m = require('query-to-mongo')
 const passport = require("passport")
-const { authenticate, refreshToken } = require("./authentication")
+const { authenticate, checkRefreshToken } = require("./authentication")
 const UserModel = require('./schema')
 const userRouter = express.Router()
 const { authorize, tutorOnlyMiddleware } = require("../middlewares/authorize")
@@ -31,14 +31,59 @@ userRouter.post("/login", async (req, res, next) => {
             httpOnly: true,
             sameSite: "none",
         })
+        res.cookie("refreshToken", checkRefreshToken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+        })
 
 
-        res.send({ token })
+        res.send({ token, checkRefreshToken })
     } catch (error) {
         next(error)
     }
 })
+//logout from this platform...
 
+userRouter.post("/logout", authorize, async (req, res, next) => {
+    try {
+        req.user.refreshTokens = req.user.refreshTokens.filter(
+            (t) => t.token !== req.token
+        )
+        await req.user.save()
+        res.send()
+    } catch (err) {
+        next(err)
+    }
+})
+//we will triger this in front-end
+userRouter.post("/refreshToken", async (req, res, next) => {
+    const oldRefreshToken = req.cookies.refreshToken
+    if (!oldRefreshToken) {
+        const error = new Error("Refresh token missing")
+        error.httpStatusCode = 403
+        next(error)
+
+    } else {
+        try {
+            const tokens = await checkRefreshToken(oldRefreshToken)
+
+            res.cookie("accessToken", tokens.token, {
+                httpOnly: true,
+            })
+            res.cookie("refreshToken", tokens.refreshToken, {
+                httpOnly: true,
+                path: "/users/refreshToken",
+            })
+            res.send()
+        } catch (error) {
+            console.log(error)
+            const err = new Error(error)
+            err.httpStatusCode = 403
+            next(err)
+        }
+    }
+})
 
 //Get all Tutors and Students
 userRouter.get("/", authorize, async (req, res, next) => {
@@ -60,10 +105,18 @@ userRouter.get("/", authorize, async (req, res, next) => {
     }
 })
 
-userRouter.get("/me", async (req, res, next) => {
+userRouter.get("/:username", authorize, async (req, res, next) => {
     try {
-        res.send(req.user)
-        console.log(req.user)
+        console.log(req.params.username)
+        if (req.user.username === req.params.username) {
+            res.send(req.user)
+            console.log(req.user)
+        }
+        else {
+            next("You have no rights!")
+            console.log("invalid username")
+        }
+
         next("While reading users list a problem occurred!")
     } catch (error) {
 
