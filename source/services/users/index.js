@@ -5,6 +5,7 @@ const { authenticate, checkRefreshToken } = require("./authentication")
 const UserModel = require('./schema')
 const userRouter = express.Router()
 const { authorize, tutorOnlyMiddleware } = require("../middlewares/authorize")
+
 //Register a new user
 userRouter.post("/register", async (req, res, next) => {
     try {
@@ -43,8 +44,8 @@ userRouter.post("/login", async (req, res, next) => {
         next(error)
     }
 })
-//logout from this platform...
 
+//logout from this platform...
 userRouter.post("/logout", authorize, async (req, res, next) => {
     try {
         req.user.refreshTokens = req.user.refreshTokens.filter(
@@ -86,7 +87,7 @@ userRouter.post("/refreshToken", async (req, res, next) => {
 })
 
 //Get all Tutors and Students
-userRouter.get("/", authorize, async (req, res, next) => {
+userRouter.get("/", async (req, res, next) => {
     try {
         const query = q2m(req.query)
 
@@ -104,7 +105,7 @@ userRouter.get("/", authorize, async (req, res, next) => {
         next(error)
     }
 })
-
+//Get single a Username
 userRouter.get("/:username", authorize, async (req, res, next) => {
     try {
         console.log(req.params.username)
@@ -122,7 +123,35 @@ userRouter.get("/:username", authorize, async (req, res, next) => {
 
     }
 })
+//Edit a single person
+userRouter.put("/:username", authorize, async (req, res, next) => {
+    try {
+        const updates = Object.keys(req.body)
+        console.log("this is updates:", updates)
+        try {
+            updates.forEach((update) => (req.user[update] = req.body[update]))
+            await req.user.save()
+            res.send(req.user)
+        } catch (error) {
+            res.status(400).send(error)
+            console.log(error)
+        }
+    } catch (error) {
+        next(error)
+    }
+})
+//Delete a single person
+userRouter.delete("/:username", authorize, async (req, res, next) => {
+    try {
+        const username = req.params.username
+        console.log(username)
+        await req.user.remove()
+        res.send(`${username} has been deleted succesfully`)
 
+    } catch (error) {
+        next(error)
+    }
+})
 
 
 module.exports = userRouter
