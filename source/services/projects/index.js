@@ -44,19 +44,38 @@ projectRouter.post("/add", authorize, async (req, res, next) => {
 
     }
 })
-
 //Get a single project
+projectRouter.get("/:id", async (req, res, next) => {
+    try {
+        const id = req.params.id
+        const project = await ProjectSchema.findById(id)
+        console.log(id)
+        console.log(project)
+        if (project) { res.send(project) } else {
+            const error = new Error()
+            error.httpStatusCode = 404
+            next(error)
+        }
+
+    } catch (error) {
+        console.log(error)
+        next(error)
+    }
+})
+
+//Edit a single project
 projectRouter.put("/:id", async (req, res, next) => {
     try {
-        const updates = Object.keys(req.body)
+        const project = await ProjectSchema.findByIdAndUpdate(req.params.id, req.body)
 
-        try {
-            updates.forEach((update) => (req.user[update] = req.body[update]))
-            await req.user.save()
-            res.send(req.user)
-        } catch (error) {
-            res.status(400).send(error)
-            console.log(error)
+        if (project) {
+
+            res.send(`The project with id ${req.params.id} is updated succesfully.`)
+        }
+        else {
+            const error = new Error(`Project with id ${req.params.id} is not found.`)
+            error.httpStatusCode = 404
+            next(error)
         }
     } catch (error) {
         next(error)
