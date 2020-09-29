@@ -4,6 +4,7 @@ const { join } = require("path")
 const listEndPoints = require('express-list-endpoints')
 const mongoose = require('mongoose')
 const userRouter = require('./services/users')
+const projectsRouter = require("./services/projects")
 const cookieParser = require("cookie-parser")
 
 const {
@@ -35,6 +36,7 @@ server.use(express.static(staticFolderPath))
 server.use(express.json())
 
 server.use("/api/users", userRouter)
+server.use("/api/projects", projectsRouter)
 
 //error handlers
 server.use(badRequest)

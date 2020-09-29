@@ -20,6 +20,10 @@ userSchema = new Schema(
         lastname: { type: String, required: true, },
         headline: { type: String, default: "" },
         about: { type: String, default: "" },
+        profilePhoto: {
+            type: String,
+            default: "https://www.pngfind.com/pngs/m/470-4703547_icon-user-icon-hd-png-download.png"
+        },
         grades: { type: Number, default: 0, min: 0, max: 10 },
         registerdate: { type: Date, default: Date.now },
         role: { type: String, enum: ["tutor", "student"], required: true, },
