@@ -1,7 +1,8 @@
 const jwt = require("jsonwebtoken")
 const User = require("./schema")
 
-const checkRefreshToken = async (oldRefreshToken) => {
+
+const refreshToken1 = async (oldRefreshToken) => {
     const decoded = await verifyRefreshToken(oldRefreshToken)
     const user = await User.findOne({ _id: decoded._id })
 
@@ -87,4 +88,4 @@ const verifyRefreshToken = (token) =>
                 res(decoded)
             }
         ))
-module.exports = { authenticate, verifyJWT, checkRefreshToken }
+module.exports = { authenticate, verifyJWT, refreshToken1 }
