@@ -20,6 +20,10 @@ userSchema = new Schema(
         lastname: { type: String, required: true, },
         headline: { type: String, default: "" },
         about: { type: String, default: "" },
+        profilePhoto: {
+            type: String,
+            default: "https://www.pngfind.com/pngs/m/470-4703547_icon-user-icon-hd-png-download.png"
+        },
         grades: { type: Number, default: 0, min: 0, max: 10 },
         registerdate: { type: Date, default: Date.now },
         role: { type: String, enum: ["tutor", "student", "admin"], required: true, },
@@ -48,9 +52,9 @@ userSchema.methods.toJSON = function () {
 }
 userSchema.statics.findByCredentials = async (email, password) => {
     const user = await UserModel.findOne({ email })
-    console.log("aleski11", user)
+
     const isMatch = await bcrypt.compare(password, user.password)
-    console.log("aleski", isMatch)
+
     if (!isMatch) {
         const error = new Error("Unable to login, please try again!")
         error.httpStatusCode = 401
