@@ -22,7 +22,7 @@ userSchema = new Schema(
         about: { type: String, default: "" },
         grades: { type: Number, default: 0, min: 0, max: 10 },
         registerdate: { type: Date, default: Date.now },
-        role: { type: String, enum: ["tutor", "student"], required: true, },
+        role: { type: String, enum: ["tutor", "student", "admin"], required: true, },
         projects: [{ type: Schema.Types.ObjectId, ref: 'projects' }],
         refreshTokens: [
             {

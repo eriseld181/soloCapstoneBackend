@@ -4,7 +4,7 @@ const passport = require("passport")
 const { authenticate, checkRefreshToken } = require("./authentication")
 const UserModel = require('./schema')
 const userRouter = express.Router()
-const { authorize, tutorOnlyMiddleware } = require("../middlewares/authorize")
+const { authorize, tutorOnlyMiddleware, adminOnlyMiddleware } = require("../middlewares/authorize")
 //Register a new user
 userRouter.post("/register", async (req, res, next) => {
     try {
@@ -44,7 +44,6 @@ userRouter.post("/login", async (req, res, next) => {
     }
 })
 //logout from this platform...
-
 userRouter.post("/logout", authorize, async (req, res, next) => {
     try {
         req.user.refreshTokens = req.user.refreshTokens.filter(
@@ -105,21 +104,20 @@ userRouter.get("/", authorize, async (req, res, next) => {
     }
 })
 
-userRouter.get("/:username", authorize, async (req, res, next) => {
+userRouter.get("/:id", tutorOnlyMiddleware, async (req, res, next) => {
     try {
-        console.log(req.params.username)
-        if (req.user.username === req.params.username) {
-            res.send(req.user)
-            console.log(req.user)
+        const id = req.params.id
+        const user = await UserModel.findById(id)
+        if (user) {
+            res.send(user)
+        } else {
+            const error = new Error()
+            error.httpStatusCode = 404
+            next(error)
         }
-        else {
-            next("You have no rights!")
-            console.log("invalid username")
-        }
-
-        next("While reading users list a problem occurred!")
     } catch (error) {
-
+        console.log(error)
+        next("While reading users list a problem occurred!")
     }
 })
 
