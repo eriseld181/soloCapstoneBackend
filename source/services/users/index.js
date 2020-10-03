@@ -6,6 +6,17 @@ const UserModel = require('./schema')
 const userRouter = express.Router()
 const { authorize, studentOnlyMiddleware } = require("../middlewares/authorize")
 
+const streamifier = require("streamifier")
+
+const cloudinary = require("cloudinary").v2
+const multer = require("multer")
+const upload = multer()
+cloudinary.config({
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.API_KEY,
+    api_secret: process.env.API_SECRET
+})
+
 //Get all Tutors and Students
 userRouter.get("/", async (req, res, next) => {
     try {
@@ -78,9 +89,9 @@ userRouter.delete("/:username", async (req, res, next) => {
 userRouter.post("/register", async (req, res, next) => {
     try {
         const newUser = new UserModel(req.body)
-
+        const userName = newUser.firstname.charAt(0).toUpperCase() + newUser.firstname.slice(1)
         const { _id } = await newUser.save()
-        res.status(201).send(_id)
+        res.status(201).send(`Welcome ${userName} to E-Tech, you have been registered successfully with id: ${_id}`)
     } catch (error) {
         next(error)
 
@@ -152,6 +163,36 @@ userRouter.post("/refreshToken", async (req, res, next) => {
             err.httpStatusCode = 403
             next(err)
         }
+    }
+})
+
+userRouter.post("/uploadImage", authorize, upload.single("image"), async (req, res, next) => {
+    try {
+        if (req.file) {
+            const cloud_upload = cloudinary.uploader.upload_stream(
+                {
+                    folder: 'E-TECH'
+                },
+                async (err, data) => {
+                    if (!err) {
+                        req.user.profilePhoto = data.secure_url
+                        await req.user.save({ validateBeforeSave: false })
+                        res.status(201).send("image is added")
+                    }
+                }
+            )
+
+            streamifier.createReadStream(req.file.buffer).pipe(cloud_upload)
+
+        } else {
+            const err = new Error()
+            err.httpStatusCode = 400
+            err.message = ' image is missing';
+            next(err)
+        }
+    } catch (error) {
+        next(error)
+        console.log(error)
     }
 })
 

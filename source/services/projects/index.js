@@ -5,6 +5,18 @@ const ProjectSchema = require('./schema')
 const { authorize, studentOnlyMiddleware } = require("../middlewares/authorize")
 const projectRouter = express.Router()
 
+const streamifier = require("streamifier")
+
+const cloudinary = require("cloudinary").v2
+const multer = require("multer")
+const upload = multer()
+cloudinary.config({
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.API_KEY,
+    api_secret: process.env.API_SECRET
+})
+
+
 //Get all Projects
 projectRouter.get("/", async (req, res, next) => {
     try {
@@ -81,6 +93,50 @@ projectRouter.put("/:id", async (req, res, next) => {
         next(error)
     }
 })
+//Delete a single project
+projectRouter.delete("/:id", async (req, res, next) => {
+    try {
+        const project = await ProjectSchema.findByIdAndDelete(req.params.id)
+        if (project) {
+            res.send(`Project with id ${req.params.id} is deleted succesfully.`)
+        } else {
+            const error = new Error(`Project with id ${req.params.id} not found`)
+            error.httpStatusCode = 404
+            next(error)
+        }
+    } catch (error) {
+        next(error)
+    }
+})
 
+projectRouter.post("/:id/uploadImage", authorize, upload.single("image"), async (req, res, next) => {
+    try {
+        if (req.file) {
+            const cloud_upload = cloudinary.uploader.upload_stream(
+                {
+                    folder: 'E-TECH'
+                },
+                async (err, data) => {
+                    if (!err) {
+                        const post = await ProjectSchema.findByIdAndUpdate({ _id: req.params.id })
+                        post.projectPhoto = data.secure_url
+                        await post.save()
+                        res.status(201).send("Image is added")
+                    }
+                }
+            )
 
+            streamifier.createReadStream(req.file.buffer).pipe(cloud_upload)
+
+        } else {
+            const err = new Error()
+            err.httpStatusCode = 400
+            err.message = ' image is missing';
+            next(err)
+        }
+    } catch (error) {
+        next(error)
+        console.log(error)
+    }
+})
 module.exports = projectRouter
