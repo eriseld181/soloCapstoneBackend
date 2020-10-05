@@ -19,6 +19,8 @@ userSchema = new Schema(
         username: { type: String, required: true },
         lastname: { type: String, required: true, },
         headline: { type: String, default: "" },
+        state: { type: String, default: "" },
+        city: { type: String, default: "" },
         about: { type: String, default: "" },
         profilePhoto: {
             type: String,
@@ -27,10 +29,7 @@ userSchema = new Schema(
         grades: { type: Number, default: 0, min: 0, max: 10 },
         registerdate: { type: Date, default: Date.now },
         role: { type: String, enum: ["tutor", "student", "admin"], required: true, },
-        userPhoto: {
-            type: String,
-            default: "https://toppng.com/uploads/preview/chf-project-blue-icon-quotes-11563133106x9u8mp8qop.png"
-        },
+
         projects: [{ type: Schema.Types.ObjectId, ref: 'projects' }],
         refreshTokens: [
             {
