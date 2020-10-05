@@ -37,22 +37,38 @@ userRouter.get("/", async (req, res, next) => {
     }
 })
 //Get single a Username
-userRouter.get("/:username", authorize, async (req, res, next) => {
+// userRouter.get("/:username", authorize, async (req, res, next) => {
+//     try {
+
+//         if (req.user.username === req.params.username) {
+//             const user = await UserModel.findOne({ username: req.params.username }).populate("projects")
+//             res.send(user)
+
+//         }
+//         else {
+//             next("You have no rights!")
+//             console.log("invalid username")
+//         }
+
+//         next("While reading users list a problem occurred!")
+//     } catch (error) {
+
+//     }
+// })
+userRouter.get("/:id", async (req, res, next) => {
     try {
-
-        if (req.user.username === req.params.username) {
-            const user = await UserModel.findOne({ username: req.params.username }).populate("projects")
+        const id = req.params.id
+        const user = await UserModel.findById(id)
+        if (user) {
             res.send(user)
-
+        } else {
+            const error = new Error()
+            error.httpStatusCode = 404
+            next(error)
         }
-        else {
-            next("You have no rights!")
-            console.log("invalid username")
-        }
-
-        next("While reading users list a problem occurred!")
     } catch (error) {
-
+        console.log(error)
+        next("While reading users list a problem occurred!")
     }
 })
 //Edit a single person
@@ -166,8 +182,20 @@ userRouter.post("/refreshToken", async (req, res, next) => {
     }
 })
 
-userRouter.post("/uploadImage", authorize, upload.single("image"), async (req, res, next) => {
+userRouter.post("/:id/uploadImage", authorize, upload.single("image"), async (req, res, next) => {
     try {
+        const id = req.params.id
+        const user = await UserModel.findById(id)
+        if (user) {
+            res.send(user)
+        } else {
+            const error = new Error()
+            error.httpStatusCode = 404
+            next(error)
+        }
+    } catch (error) {
+        console.log(error)
+        next("While reading user list a problem occurred!")
         if (req.file) {
             const cloud_upload = cloudinary.uploader.upload_stream(
                 {
@@ -175,6 +203,7 @@ userRouter.post("/uploadImage", authorize, upload.single("image"), async (req, r
                 },
                 async (err, data) => {
                     if (!err) {
+                        console.log(req.user.profilePhoto)
                         req.user.profilePhoto = data.secure_url
                         await req.user.save({ validateBeforeSave: false })
                         res.status(201).send("image is added")
@@ -190,10 +219,8 @@ userRouter.post("/uploadImage", authorize, upload.single("image"), async (req, r
             err.message = ' image is missing';
             next(err)
         }
-    } catch (error) {
-        next(error)
-        console.log(error)
     }
 })
+
 
 module.exports = userRouter
