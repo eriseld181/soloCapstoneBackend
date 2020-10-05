@@ -4,8 +4,7 @@ const q2m = require('query-to-mongo')
 const { authenticate, refreshToken1 } = require("./authentication")
 const UserModel = require('./schema')
 const userRouter = express.Router()
-const { authorize, tutorOnlyMiddleware } = require("../middlewares/authorize")
-
+const { authorize, tutorOnlyMiddleware, adminOnlyMiddleware } = require("../middlewares/authorize")
 
 const streamifier = require("streamifier")
 
@@ -19,7 +18,7 @@ cloudinary.config({
 })
 
 //Get all Tutors and Students
-userRouter.get("/", async (req, res, next) => {
+userRouter.get("/", authorize, tutorOnlyMiddleware, async (req, res, next) => {
     try {
         const query = q2m(req.query)
 
@@ -37,23 +36,21 @@ userRouter.get("/", async (req, res, next) => {
         next(error)
     }
 })
-//Get single a Username
-userRouter.get("/:username", authorize, async (req, res, next) => {
+
+userRouter.get("/:id", async (req, res, next) => {
     try {
-
-        if (req.user.username === req.params.username) {
-            const user = await UserModel.findOne({ username: req.params.username }).populate("projects")
+        const id = req.params.id
+        const user = await UserModel.findById(id)
+        if (user) {
             res.send(user)
-
+        } else {
+            const error = new Error()
+            error.httpStatusCode = 404
+            next(error)
         }
-        else {
-            next("You have no rights!")
-            console.log("invalid username")
-        }
-
-        next("While reading users list a problem occurred!")
     } catch (error) {
-
+        console.log(error)
+        next("While reading users list a problem occurred!")
     }
 })
 //Edit a single person
@@ -127,103 +124,85 @@ userRouter.post("/login", async (req, res, next) => {
     }
 })
 //logout from this platform...
-userRouter.post("/logout", authorize, async (req, res, next) => {
-    userRouter.post("/logout", async (req, res, next) => {
+userRouter.post("/logout", async (req, res, next) => {
+    try {
+        req.user.refreshTokens = req.user.refreshTokens.filter(
+            (t) => t.token !== req.token
+        )
+        await req.user.save()
+        res.send()
+    } catch (err) {
+        next(err)
+    }
+})
+//we will triger this in front-end
+userRouter.post("/refreshToken", async (req, res, next) => {
+    const oldRefreshToken = req.cookies.refreshToken
+    if (!oldRefreshToken) {
+        const error = new Error("Refresh token missing")
+        error.httpStatusCode = 403
+        next(error)
+
+    } else {
         try {
-            req.user.refreshTokens = req.user.refreshTokens.filter(
-                (t) => t.token !== req.token
-            )
-            await req.user.save()
-            res.send()
-        } catch (err) {
-            next(err)
-        }
-    })
-    //we will triger this in front-end
-    userRouter.post("/refreshToken", async (req, res, next) => {
-        const oldRefreshToken = req.cookies.refreshToken
-        if (!oldRefreshToken) {
-            const error = new Error("Refresh token missing")
-            error.httpStatusCode = 403
-            next(error)
+            const tokens = await refreshToken1(oldRefreshToken)
 
-        } else {
-            try {
-                const tokens = await refreshToken1(oldRefreshToken)
-
-                res.cookie("accessToken", tokens.token, {
-                    httpOnly: true,
-                })
-                res.cookie("refreshToken", tokens.refreshToken, {
-                    httpOnly: true,
-                    path: "/refreshToken",
-                })
-                res.send("ok")
-            } catch (error) {
-                console.log(error)
-                const err = new Error(error)
-                err.httpStatusCode = 403
-                next(err)
-            }
-        }
-    })
-
-    // userRouter.post("/uploadImage", authorize, upload.single("image"), async (req, res, next) => {
-    //     try {
-    //         const query = q2m(req.query)
-
-    //         const users = await UserModel.find(query.criteria, query.options.fields)
-    //             .skip(query.options.skip)
-    //             .limit(query.options.limit)
-    //             .sort(query.options.sort)
-    //         console.log(users)
-    //         res.send({
-    //             users,
-    //             total: users.length,
-    //         })
-    //     } catch (error) {
-    //         console.log(error)
-    //         next(error)
-    //     }
-    // })
-    userRouter.post("/:id/uploadImage", authorize, upload.single("image"), async (req, res, next) => {
-        try {
-            const id = req.params.id
-            const user = await UserModel.findById(id)
-            if (user) {
-                res.send(user)
-            } else {
-                const error = new Error()
-                error.httpStatusCode = 404
-                next(error)
-            }
+            res.cookie("accessToken", tokens.token, {
+                httpOnly: true,
+            })
+            res.cookie("refreshToken", tokens.refreshToken, {
+                httpOnly: true,
+                path: "/refreshToken",
+            })
+            res.send("ok")
         } catch (error) {
             console.log(error)
-            next("While reading users list a problem occurred!")
-            if (req.file) {
-                const cloud_upload = cloudinary.uploader.upload_stream(
-                    {
-                        folder: 'E-TECH'
-                    },
-                    async (err, data) => {
-                        if (!err) {
-                            req.user.profilePhoto = data.secure_url
-                            await req.user.save({ validateBeforeSave: false })
-                            res.status(201).send("image is added")
-                        }
-                    }
-                )
-
-                streamifier.createReadStream(req.file.buffer).pipe(cloud_upload)
-
-            } else {
-                const err = new Error()
-                err.httpStatusCode = 400
-                err.message = ' image is missing';
-                next(err)
-            }
+            const err = new Error(error)
+            err.httpStatusCode = 403
+            next(err)
         }
-    })
+    }
 })
+
+userRouter.post("/:id/uploadImage", authorize, upload.single("image"), async (req, res, next) => {
+    try {
+        const id = req.params.id
+        const user = await UserModel.findById(id)
+        if (user) {
+            res.send(user)
+        } else {
+            const error = new Error()
+            error.httpStatusCode = 404
+            next(error)
+        }
+    } catch (error) {
+        console.log(error)
+        next("While reading user list a problem occurred!")
+        if (req.file) {
+            const cloud_upload = cloudinary.uploader.upload_stream(
+                {
+                    folder: 'E-TECH'
+                },
+                async (err, data) => {
+                    if (!err) {
+
+                        req.user.profilePhoto = data.secure_url
+                        await req.user.save({ validateBeforeSave: false })
+                        res.status(201).send("image is added")
+                    }
+                }
+            )
+
+            streamifier.createReadStream(req.file.buffer).pipe(cloud_upload)
+
+        } else {
+            const err = new Error()
+            err.httpStatusCode = 400
+            err.message = ' image is missing';
+            next(err)
+        }
+    }
+})
+
 
 module.exports = userRouter
