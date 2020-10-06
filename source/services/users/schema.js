@@ -16,7 +16,7 @@ userSchema = new Schema(
         },
         password: { type: String, minlength: 8, },
         firstname: { type: String, required: true },
-        username: { type: String, required: true },
+        username: { type: String, default: "" },
         lastname: { type: String, required: true, },
         headline: { type: String, default: "" },
         about: { type: String, default: "" },
@@ -26,7 +26,7 @@ userSchema = new Schema(
         },
         grades: { type: Number, default: 0, min: 0, max: 10 },
         registerdate: { type: Date, default: Date.now },
-        role: { type: String, enum: ["tutor", "student", "admin"], required: true, },
+        role: { type: String, enum: ["tutor", "student", "admin"], required: true, default: "student" },
         userPhoto: {
             type: String,
             default: "https://toppng.com/uploads/preview/chf-project-blue-icon-quotes-11563133106x9u8mp8qop.png"
