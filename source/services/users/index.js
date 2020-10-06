@@ -37,67 +37,50 @@ userRouter.get("/", async (req, res, next) => {
     }
 })
 //Get single a Username
-// userRouter.get("/:username", authorize, async (req, res, next) => {
-//     try {
+userRouter.get("/:id", authorize, async (req, res, next) => {
 
-//         if (req.user.username === req.params.username) {
-//             const user = await UserModel.findOne({ username: req.params.username }).populate("projects")
-//             res.send(user)
-
-//         }
-//         else {
-//             next("You have no rights!")
-//             console.log("invalid username")
-//         }
-
-//         next("While reading users list a problem occurred!")
-//     } catch (error) {
-
-//     }
-// })
-userRouter.get("/:id", async (req, res, next) => {
     try {
-        const id = req.params.id
-        const user = await UserModel.findById(id)
-        if (user) {
-            res.send(user)
-        } else {
-            const error = new Error()
-            error.httpStatusCode = 404
-            next(error)
-        }
+        console.log(req.user)
+        res.send(req.user)
     } catch (error) {
-        console.log(error)
         next("While reading users list a problem occurred!")
     }
+
 })
 //Edit a single person
-userRouter.put("/:username", async (req, res, next) => {
-    try {
-        const updates = Object.keys(req.body)
-
+userRouter.put("/:id", authorize, async (req, res, next) => {
+    if (req.user._id === req.params.id) {
         try {
-            updates.forEach((update) => (req.user[update] = req.body[update]))
-            await req.user.save()
-            res.send(req.user)
+            const updates = Object.keys(req.body)
+
+            try {
+                updates.forEach((update) => (req.user[update] = req.body[update]))
+                await req.user.save()
+                res.send(req.user)
+            } catch (e) {
+                res.status(400).send(e)
+            }
         } catch (error) {
-            res.status(400).send(error)
-            console.log(error)
+            next(error)
         }
-    } catch (error) {
-        next(error)
+    } else {
+        console.log("no")
+        res.send(401)
     }
+
 })
 //Delete a single person
-userRouter.delete("/:username", async (req, res, next) => {
-    try {
-        const username = req.params.username
-
-        await req.user.remove()
-        res.send(`${username} has been deleted succesfully`)
-
-    } catch (error) {
-        next(error)
+userRouter.delete("/:id", authorize, async (req, res, next) => {
+    if (req.user._id === req.params.id) {
+        try {
+            await req.user.remove()
+            res.send("Deleted")
+        } catch (error) {
+            next(error)
+        }
+    } else {
+        console.log("no")
+        res.send(401)
     }
 })
 //==========================================================================
