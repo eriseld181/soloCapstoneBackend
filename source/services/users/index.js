@@ -4,7 +4,7 @@ const q2m = require('query-to-mongo')
 const { authenticate, refreshToken1 } = require("./authentication")
 const UserModel = require('./schema')
 const userRouter = express.Router()
-const { authorize, studentOnlyMiddleware } = require("../middlewares/authorize")
+const { authorize, tutorOnlyMiddleware } = require("../middlewares/authorize")
 
 const streamifier = require("streamifier")
 
@@ -18,7 +18,7 @@ cloudinary.config({
 })
 
 //Get all Tutors and Students
-userRouter.get("/", async (req, res, next) => {
+userRouter.get("/", authorize, async (req, res, next) => {
     try {
         const query = q2m(req.query)
 
@@ -49,8 +49,13 @@ userRouter.get("/:id", authorize, async (req, res, next) => {
 })
 //Edit a single person
 userRouter.put("/:id", authorize, async (req, res, next) => {
-    if (req.user._id === req.params.id) {
+    console.log(req.user._id.equals(req.params.id))
+    console.log(req.params.id)
+    if (req.user._id.equals(req.params.id)) {
         try {
+            if (req.user.role !== "tutor" && req.body.role) {
+                res.send("You cannot edit the role, only tutor can.")
+            } else { }
             const updates = Object.keys(req.body)
 
             try {
@@ -64,13 +69,14 @@ userRouter.put("/:id", authorize, async (req, res, next) => {
             next(error)
         }
     } else {
+
         console.log("no")
         res.send(401)
     }
 
 })
 //Delete a single person
-userRouter.delete("/:id", authorize, async (req, res, next) => {
+userRouter.delete("/:id", async (req, res, next) => {
     if (req.user._id === req.params.id) {
         try {
             await req.user.remove()
@@ -103,9 +109,9 @@ userRouter.post("/login", async (req, res, next) => {
 
         const user = await UserModel.findByCredentials(email, password)
 
-
         const token = await authenticate(user)
-        res.cookie("accessToken", token, {
+        console.log(token)
+        res.cookie("accessToken", token.token, {
             secure: true,
             httpOnly: true,
             sameSite: true,
