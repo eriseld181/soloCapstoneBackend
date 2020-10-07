@@ -24,11 +24,11 @@ const authorize = async (req, res, next) => {
 
     }
 }
-const studentOnlyMiddleware = async (req, res, next) => {
+const tutorOnlyMiddleware = async (req, res, next) => {
 
-    if (req.user && req.user.role === "student") next()
+    if (req.user && req.user.role === "tutor") next()
     else {
-        const error = new Error("You cannot perform this action, only student can!")
+        const error = new Error("You cannot perform this action, only Tutor can!")
         error.httpStatusCode = 403
         next(error)
     }
@@ -43,4 +43,4 @@ const studentOnlyMiddleware = async (req, res, next) => {
 //     }
 // }
 
-module.exports = { authorize, studentOnlyMiddleware }
+module.exports = { authorize, tutorOnlyMiddleware }

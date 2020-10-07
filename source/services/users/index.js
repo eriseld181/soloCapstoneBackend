@@ -18,7 +18,7 @@ cloudinary.config({
 })
 
 //Get all Tutors and Students
-userRouter.get("/", authorize, async (req, res, next) => {
+userRouter.get("/", authorize, tutorOnlyMiddleware, async (req, res, next) => {
     try {
         const query = q2m(req.query)
 
@@ -110,22 +110,21 @@ userRouter.post("/login", async (req, res, next) => {
         const user = await UserModel.findByCredentials(email, password)
 
         const token = await authenticate(user)
-        console.log(token)
+
+        // console.log(token)
         res.cookie("accessToken", token.token, {
-            secure: true,
-            httpOnly: true,
-            sameSite: true,
+            // secure: true,
+            // httpOnly: true,
+            // sameSite: true,
         })
 
-        res.cookie("refreshToken", refreshToken1, {
-            httpOnly: true,
-            secure: true,
-            path: "/refreshToken",
-            sameSite: true,
+        res.cookie("refreshToken", token.refreshToken, {
+            // httpOnly: true,
+            // secure: true,
+            // path: "/refreshToken",
+            // sameSite: true,
         })
-
-
-        res.send({ token, refreshToken1 })
+        res.send("ok")
     } catch (error) {
         next(error)
     }
