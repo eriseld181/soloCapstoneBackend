@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon -r dotenv/config ./source/server.js"
+    "dev": "nodemon -r dotenv/config ./source/server.js",
+    "start": "node ./src/server.js"
   },
   "repository": {
     "type": "git",
@@ -18,6 +19,7 @@
   },
   "homepage": "https://github.com/eriseld181/soloCapstoneBackend#readme",
   "dependencies": {
+    "ejs": "^2.5.6",
     "atob": "^2.1.2",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",

@@ -41,23 +41,28 @@ homeworkRouter.get("/", authorize, async (req, res, next) => {
   }
 });
 //Post a new project
-homeworkRouter.post("/add", authorize, async (req, res, next) => {
-  try {
-    const user = req.user._id;
-    //when you do a post you add userId, to get user to project
-    const newProject = new HomeworkSchema({ ...req.body, userId: user });
-    await newProject.save();
+homeworkRouter.post(
+  "/add",
+  authorize,
+  tutorOnlyMiddleware,
+  async (req, res, next) => {
+    try {
+      const user = req.user._id;
+      //when you do a post you add userId, to get user to project
+      const newProject = new HomeworkSchema({ ...req.body, userId: user });
+      await newProject.save();
 
-    const attachUser = await userSchema.findByIdAndUpdate({ _id: user });
+      const attachUser = await userSchema.findByIdAndUpdate({ _id: user });
 
-    const projects = attachUser.projects;
-    projects.push(newProject._id);
-    await attachUser.save({ validateBeforeSave: false });
-    res.status(201).send(attachUser);
-  } catch (error) {
-    next(error);
+      const projects = attachUser.projects;
+      projects.push(newProject._id);
+      await attachUser.save({ validateBeforeSave: false });
+      res.status(201).send(attachUser);
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 //Get a single project
 homeworkRouter.get("/:id", authorize, async (req, res, next) => {
   try {
