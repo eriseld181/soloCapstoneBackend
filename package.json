@@ -19,7 +19,6 @@
   },
   "homepage": "https://github.com/eriseld181/soloCapstoneBackend#readme",
   "dependencies": {
-    "ejs": "^2.5.6",
     "atob": "^2.1.2",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
@@ -27,6 +26,7 @@
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
+    "ejs": "^2.7.4",
     "express": "^4.17.1",
     "express-list-endpoints": "^5.0.0",
     "json-web-token": "^3.2.0",
