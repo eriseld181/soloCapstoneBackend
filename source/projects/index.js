@@ -1,9 +1,12 @@
 const express = require("express");
 const q2m = require("query-to-mongo");
 const userSchema = require("../users/schema");
-const HomeworkSchema = require("./schema");
-const { authorize, tutorOnlyMiddleware } = require("../middlewares/authorize");
-const homeworkRouter = express.Router();
+const ProjectSchema = require("./schema");
+const {
+  authorize,
+  studentOnlyMiddleware,
+} = require("../middlewares/authorize");
+const projectRouter = express.Router();
 
 const streamifier = require("streamifier");
 
@@ -17,11 +20,11 @@ cloudinary.config({
 });
 
 //Get all Projects
-homeworkRouter.get("/", authorize, async (req, res, next) => {
+projectRouter.get("/", authorize, async (req, res, next) => {
   try {
     const query = q2m(req.query);
 
-    const projects = await HomeworkSchema.find(
+    const projects = await ProjectSchema.find(
       query.criteria,
       query.options.fields
     )
@@ -41,11 +44,13 @@ homeworkRouter.get("/", authorize, async (req, res, next) => {
   }
 });
 //Post a new project
-homeworkRouter.post("/add", authorize, async (req, res, next) => {
+projectRouter.post("/add", authorize, async (req, res, next) => {
   try {
+    console.log(req.user.id);
+    console.log("aleksi", req.user._id);
     const user = req.user._id;
     //when you do a post you add userId, to get user to project
-    const newProject = new HomeworkSchema({ ...req.body, userId: user });
+    const newProject = new ProjectSchema({ ...req.body, userId: user });
     await newProject.save();
 
     const attachUser = await userSchema.findByIdAndUpdate({ _id: user });
@@ -59,11 +64,12 @@ homeworkRouter.post("/add", authorize, async (req, res, next) => {
   }
 });
 //Get a single project
-homeworkRouter.get("/:id", authorize, async (req, res, next) => {
+projectRouter.get("/:id", authorize, async (req, res, next) => {
   try {
     const id = req.params.id;
-    const project = await HomeworkSchema.findById(id);
-
+    const project = await ProjectSchema.findById(id);
+    console.log(id);
+    console.log(project);
     if (project) {
       res.send(project);
     } else {
@@ -78,9 +84,9 @@ homeworkRouter.get("/:id", authorize, async (req, res, next) => {
 });
 
 //Edit a single project
-homeworkRouter.put("/:id", authorize, async (req, res, next) => {
+projectRouter.put("/:id", authorize, async (req, res, next) => {
   try {
-    const project = await HomeworkSchema.findByIdAndUpdate(
+    const project = await ProjectSchema.findByIdAndUpdate(
       req.params.id,
       req.body
     );
@@ -97,9 +103,9 @@ homeworkRouter.put("/:id", authorize, async (req, res, next) => {
   }
 });
 //Delete a single project
-homeworkRouter.delete("/:id", authorize, async (req, res, next) => {
+projectRouter.delete("/:id", authorize, async (req, res, next) => {
   try {
-    const project = await HomeworkSchema.findByIdAndDelete(req.params.id);
+    const project = await ProjectSchema.findByIdAndDelete(req.params.id);
     if (project) {
       res.send(`Project with id ${req.params.id} is deleted succesfully.`);
     } else {
@@ -112,7 +118,7 @@ homeworkRouter.delete("/:id", authorize, async (req, res, next) => {
   }
 });
 
-homeworkRouter.post(
+projectRouter.post(
   "/:id/uploadImage",
   authorize,
   upload.single("image"),
@@ -125,7 +131,7 @@ homeworkRouter.post(
           },
           async (err, data) => {
             if (!err) {
-              const post = await HomeworkSchema.findByIdAndUpdate({
+              const post = await ProjectSchema.findByIdAndUpdate({
                 _id: req.params.id,
               });
               post.projectPhoto = data.secure_url;
@@ -148,4 +154,4 @@ homeworkRouter.post(
     }
   }
 );
-module.exports = homeworkRouter;
+module.exports = projectRouter;
