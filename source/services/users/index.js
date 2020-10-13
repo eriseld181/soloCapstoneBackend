@@ -39,7 +39,6 @@ userRouter.get("/", authorize, async (req, res, next) => {
 });
 userRouter.get("/me", authorize, async (req, res, next) => {
   try {
-   
     console.log(req.user);
     res.send(req.user);
   } catch (error) {
@@ -48,7 +47,9 @@ userRouter.get("/me", authorize, async (req, res, next) => {
 });
 userRouter.get("/me/projects", authorize, async (req, res, next) => {
   try {
-    const user = await UserModel.find({_id:req.user._id}).populate("projects")
+    const user = await UserModel.find({ _id: req.user._id }).populate(
+      "projects"
+    );
     res.send(user);
   } catch (error) {
     next("While reading users list a problem occurred!");
@@ -133,16 +134,16 @@ userRouter.post("/login", async (req, res, next) => {
 
     // console.log(token)
     res.cookie("accessToken", token.token, {
-      // secure: true,
-      // httpOnly: true,
-      // sameSite: true,
+      secure: true,
+      httpOnly: true,
+      sameSite: true,
     });
 
     res.cookie("refreshToken", token.refreshToken, {
-      // httpOnly: true,
-      // secure: true,
-      // path: "/refreshToken",
-      // sameSite: true,
+      httpOnly: true,
+      secure: true,
+      path: "/refreshToken",
+      sameSite: true,
     });
     res.send("ok");
   } catch (error) {
