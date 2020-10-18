@@ -1,33 +1,30 @@
 const express = require("express");
 const q2m = require("query-to-mongo");
 const userSchema = require("../users/schema");
-const ProjectSchema = require("./schema");
+const noteSchema = require("./schema");
 const {
   authorize,
   studentOnlyMiddleware,
 } = require("../middlewares/authorize");
-const projectRouter = express.Router();
-
+const noteRouter = express.Router();
 const streamifier = require("streamifier");
-
 const cloudinary = require("cloudinary").v2;
 const multer = require("multer");
 const upload = multer();
+
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.API_KEY,
   api_secret: process.env.API_SECRET,
 });
 
-//Get all Projects
-projectRouter.get("/", authorize, async (req, res, next) => {
+//Get all user notes
+noteRouter.get("/", authorize, async (req, res, next) => {
   try {
     const query = q2m(req.query);
 
-    const projects = await ProjectSchema.find(
-      query.criteria,
-      query.options.fields
-    )
+    const notes = await noteSchema
+      .find(query.criteria, query.options.fields)
       .populate("userId")
 
       .skip(query.options.skip)
@@ -37,41 +34,38 @@ projectRouter.get("/", authorize, async (req, res, next) => {
         dateOfCreation: -1,
       });
 
-    res.send(projects);
+    res.send(notes);
   } catch (error) {
     console.log(error);
     next(error);
   }
 });
-//Post a new project
-projectRouter.post("/add", authorize, async (req, res, next) => {
+//Post a new note
+noteRouter.post("/add", authorize, async (req, res, next) => {
   try {
-    console.log(req.user.id);
-    console.log("aleksi", req.user._id);
     const user = req.user._id;
     //when you do a post you add userId, to get user to project
-    const newProject = new ProjectSchema({ ...req.body, userId: user });
-    await newProject.save();
+    const newNote = new noteSchema({ ...req.body, userId: user });
+    await newNote.save();
 
     const attachUser = await userSchema.findByIdAndUpdate({ _id: user });
 
-    const projects = attachUser.projects;
-    projects.push(newProject._id);
+    const notes = attachUser.notes;
+    notes.push(newNote._id);
     await attachUser.save({ validateBeforeSave: false });
     res.status(201).send(attachUser);
   } catch (error) {
     next(error);
   }
 });
-//Get a single project
-projectRouter.get("/:id", authorize, async (req, res, next) => {
+//Get a single note
+noteRouter.get("/:id", authorize, async (req, res, next) => {
   try {
     const id = req.params.id;
-    const project = await ProjectSchema.findById(id);
-    console.log(id);
-    console.log(project);
-    if (project) {
-      res.send(project);
+    const note = await noteSchema.findById(id);
+
+    if (note) {
+      res.send(note);
     } else {
       const error = new Error();
       error.httpStatusCode = 404;
@@ -83,18 +77,15 @@ projectRouter.get("/:id", authorize, async (req, res, next) => {
   }
 });
 
-//Edit a single project
-projectRouter.put("/:id", authorize, async (req, res, next) => {
+//Edit a single note
+noteRouter.put("/:id", authorize, async (req, res, next) => {
   try {
-    const project = await ProjectSchema.findByIdAndUpdate(
-      req.params.id,
-      req.body
-    );
+    const note = await noteSchema.findByIdAndUpdate(req.params.id, req.body);
 
-    if (project) {
-      res.send(`The project with id ${req.params.id} is updated succesfully.`);
+    if (note) {
+      res.send(`The note with id ${req.params.id} is updated succesfully.`);
     } else {
-      const error = new Error(`Project with id ${req.params.id} is not found.`);
+      const error = new Error(`Note with id ${req.params.id} is not found.`);
       error.httpStatusCode = 404;
       next(error);
     }
@@ -102,14 +93,14 @@ projectRouter.put("/:id", authorize, async (req, res, next) => {
     next(error);
   }
 });
-//Delete a single project
-projectRouter.delete("/:id", authorize, async (req, res, next) => {
+//Delete a single note
+noteRouter.delete("/:id", authorize, async (req, res, next) => {
   try {
-    const project = await ProjectSchema.findByIdAndDelete(req.params.id);
-    if (project) {
-      res.send(`Project with id ${req.params.id} is deleted succesfully.`);
+    const note = await noteSchema.findByIdAndDelete(req.params.id);
+    if (note) {
+      res.send(`Note with id ${req.params.id} is deleted succesfully.`);
     } else {
-      const error = new Error(`Project with id ${req.params.id} not found`);
+      const error = new Error(`Note with id ${req.params.id} not found`);
       error.httpStatusCode = 404;
       next(error);
     }
@@ -118,7 +109,7 @@ projectRouter.delete("/:id", authorize, async (req, res, next) => {
   }
 });
 
-projectRouter.post(
+noteRouter.post(
   "/:id/uploadImage",
   authorize,
   upload.single("image"),
@@ -127,14 +118,14 @@ projectRouter.post(
       if (req.file) {
         const cloud_upload = cloudinary.uploader.upload_stream(
           {
-            folder: "E-TECH",
+            folder: "E-TECH-NOTES",
           },
           async (err, data) => {
             if (!err) {
-              const post = await ProjectSchema.findByIdAndUpdate({
+              const post = await noteSchema.findByIdAndUpdate({
                 _id: req.params.id,
               });
-              post.projectPhoto = data.secure_url;
+              post.notePhoto = data.secure_url;
               await post.save();
               res.status(201).send("Image is added");
             }
@@ -154,4 +145,4 @@ projectRouter.post(
     }
   }
 );
-module.exports = projectRouter;
+module.exports = noteRouter;

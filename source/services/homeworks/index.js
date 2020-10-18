@@ -15,13 +15,12 @@ cloudinary.config({
   api_key: process.env.API_KEY,
   api_secret: process.env.API_SECRET,
 });
-
-//Get all Projects
+//Get all Homeworks
 homeworkRouter.get("/", authorize, async (req, res, next) => {
   try {
     const query = q2m(req.query);
 
-    const projects = await HomeworkSchema.find(
+    const homework = await HomeworkSchema.find(
       query.criteria,
       query.options.fields
     )
@@ -34,13 +33,13 @@ homeworkRouter.get("/", authorize, async (req, res, next) => {
         dateOfCreation: -1,
       });
 
-    res.send(projects);
+    res.send(homework);
   } catch (error) {
     console.log(error);
     next(error);
   }
 });
-//Post a new project
+//Post a new homework
 homeworkRouter.post(
   "/add",
   authorize,
@@ -48,14 +47,15 @@ homeworkRouter.post(
   async (req, res, next) => {
     try {
       const user = req.user._id;
-      //when you do a post you add userId, to get user to project
-      const newProject = new HomeworkSchema({ ...req.body, userId: user });
-      await newProject.save();
+      //when you do a post you add userId, to get user to homeworks
+      const newHomework = new HomeworkSchema({ ...req.body, userId: user });
+
+      await newHomework.save();
 
       const attachUser = await userSchema.findByIdAndUpdate({ _id: user });
-
-      const projects = attachUser.projects;
-      projects.push(newProject._id);
+      const homeworks = attachUser.homeworks;
+      console.log(homeworks);
+      homeworks.push(newHomework._id);
       await attachUser.save({ validateBeforeSave: false });
       res.status(201).send(attachUser);
     } catch (error) {
@@ -63,14 +63,14 @@ homeworkRouter.post(
     }
   }
 );
-//Get a single project
+//Get a single homework
 homeworkRouter.get("/:id", authorize, async (req, res, next) => {
   try {
     const id = req.params.id;
-    const project = await HomeworkSchema.findById(id);
+    const homework = await HomeworkSchema.findById(id);
 
-    if (project) {
-      res.send(project);
+    if (homework) {
+      res.send(homework);
     } else {
       const error = new Error();
       error.httpStatusCode = 404;
@@ -82,40 +82,54 @@ homeworkRouter.get("/:id", authorize, async (req, res, next) => {
   }
 });
 
-//Edit a single project
-homeworkRouter.put("/:id", authorize, async (req, res, next) => {
-  try {
-    const project = await HomeworkSchema.findByIdAndUpdate(
-      req.params.id,
-      req.body
-    );
+//Edit a single homework
+homeworkRouter.put(
+  "/:id",
+  authorize,
+  tutorOnlyMiddleware,
+  async (req, res, next) => {
+    try {
+      const homework = await HomeworkSchema.findByIdAndUpdate(
+        req.params.id,
+        req.body
+      );
 
-    if (project) {
-      res.send(`The project with id ${req.params.id} is updated succesfully.`);
-    } else {
-      const error = new Error(`Project with id ${req.params.id} is not found.`);
-      error.httpStatusCode = 404;
+      if (homework) {
+        res.send(
+          `The homework with id ${req.params.id} is updated succesfully.`
+        );
+      } else {
+        const error = new Error(
+          `Homework with id ${req.params.id} is not found.`
+        );
+        error.httpStatusCode = 404;
+        next(error);
+      }
+    } catch (error) {
       next(error);
     }
-  } catch (error) {
-    next(error);
   }
-});
-//Delete a single project
-homeworkRouter.delete("/:id", authorize, async (req, res, next) => {
-  try {
-    const project = await HomeworkSchema.findByIdAndDelete(req.params.id);
-    if (project) {
-      res.send(`Project with id ${req.params.id} is deleted succesfully.`);
-    } else {
-      const error = new Error(`Project with id ${req.params.id} not found`);
-      error.httpStatusCode = 404;
+);
+//Delete a single Homework
+homeworkRouter.delete(
+  "/:id",
+  authorize,
+  tutorOnlyMiddleware,
+  async (req, res, next) => {
+    try {
+      const homework = await HomeworkSchema.findByIdAndDelete(req.params.id);
+      if (homework) {
+        res.send(`homework with id ${req.params.id} is deleted succesfully.`);
+      } else {
+        const error = new Error(`Homework with id ${req.params.id} not found`);
+        error.httpStatusCode = 404;
+        next(error);
+      }
+    } catch (error) {
       next(error);
     }
-  } catch (error) {
-    next(error);
   }
-});
+);
 
 homeworkRouter.post(
   "/:id/uploadImage",
@@ -133,7 +147,7 @@ homeworkRouter.post(
               const post = await HomeworkSchema.findByIdAndUpdate({
                 _id: req.params.id,
               });
-              post.projectPhoto = data.secure_url;
+              post.homeworkPhotos = data.secure_url;
               await post.save();
               res.status(201).send("Image is added");
             }

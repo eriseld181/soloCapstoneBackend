@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 const userRouter = require("./services/users");
 const HomeworkRouter = require("./services/homeworks");
 const projectRouter = require("./services/projects");
+const NotesRouter = require("./services/notes");
 const cookieParser = require("cookie-parser");
 
 const {
@@ -39,6 +40,7 @@ server.use(express.json());
 server.use("/api/users", userRouter);
 server.use("/api/projects", projectRouter);
 server.use("/api/homeworks", HomeworkRouter);
+server.use("/api/notes", NotesRouter);
 
 //error handlers
 server.use(badRequest);

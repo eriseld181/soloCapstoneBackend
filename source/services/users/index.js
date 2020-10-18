@@ -134,16 +134,16 @@ userRouter.post("/login", async (req, res, next) => {
 
     // console.log(token)
     res.cookie("accessToken", token.token, {
-      secure: true,
-      httpOnly: true,
-      sameSite: true,
+      // secure: true,
+      // httpOnly: true,
+      // sameSite: true,
     });
 
     res.cookie("refreshToken", token.refreshToken, {
-      httpOnly: true,
-      secure: true,
-      path: "/refreshToken",
-      sameSite: true,
+      // httpOnly: true,
+      // secure: true,
+      // path: "/refreshToken",
+      // sameSite: true,
     });
     res.send("ok");
   } catch (error) {
@@ -177,11 +177,11 @@ userRouter.post("/refreshToken", async (req, res, next) => {
       const tokens = await refreshToken1(oldRefreshToken);
 
       res.cookie("accessToken", tokens.token, {
-        httpOnly: true,
+        // httpOnly: true,
       });
       res.cookie("refreshToken", tokens.refreshToken, {
-        httpOnly: true,
-        path: "/refreshToken",
+        // httpOnly: true,
+        // path: "/refreshToken",
       });
       res.send("ok");
     } catch (error) {

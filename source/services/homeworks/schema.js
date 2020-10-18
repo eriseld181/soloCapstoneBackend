@@ -7,10 +7,9 @@ const homeworkSchema = new Schema({
   homeworkPhotos: [
     {
       type: String,
-      default:
-        "https://res.cloudinary.com/social4marketing/image/upload/v1602529806/E-TECH/projects_n7jnhy.png",
     },
   ],
+
   userId: { type: Schema.Types.ObjectId, ref: "users" },
 });
 homeworkSchema.post("validate", function (error, doc, next) {

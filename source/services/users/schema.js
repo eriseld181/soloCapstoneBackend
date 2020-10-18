@@ -21,6 +21,7 @@ userSchema = new Schema(
     },
     password: { type: String, minlength: 8 },
     firstname: { type: String, required: true },
+    headline: { type: String, default: "" },
     username: { type: String, default: "" },
     lastname: { type: String, required: true },
     github: { type: String, default: "https://github.com/" },
@@ -45,7 +46,9 @@ userSchema = new Schema(
       default:
         "https://toppng.com/uploads/preview/chf-project-blue-icon-quotes-11563133106x9u8mp8qop.png",
     },
-   projects: [{ type: Schema.Types.ObjectId, ref: "projects" }],
+    projects: [{ type: Schema.Types.ObjectId, ref: "projects" }],
+    homeworks: [{ type: Schema.Types.ObjectId, ref: "homeworks" }],
+    notes: [{ type: Schema.Types.ObjectId, ref: "homeworks" }],
     refreshTokens: [
       {
         token: {
