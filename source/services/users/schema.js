@@ -48,7 +48,8 @@ userSchema = new Schema(
     },
     projects: [{ type: Schema.Types.ObjectId, ref: "projects" }],
     homeworks: [{ type: Schema.Types.ObjectId, ref: "homeworks" }],
-    notes: [{ type: Schema.Types.ObjectId, ref: "homeworks" }],
+    notes: [{ type: Schema.Types.ObjectId, ref: "notes" }],
+    posts: [{ type: Schema.Types.ObjectId, ref: "posts" }],
     refreshTokens: [
       {
         token: {

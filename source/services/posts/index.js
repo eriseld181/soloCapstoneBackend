@@ -1,12 +1,10 @@
 const express = require("express");
 const q2m = require("query-to-mongo");
 const userSchema = require("../users/schema");
-const HomeworkSchema = require("./schema");
+const postModel = require("./schema");
 const { authorize, tutorOnlyMiddleware } = require("../middlewares/authorize");
-const homeworkRouter = express.Router();
-
+const postRouter = express.Router();
 const streamifier = require("streamifier");
-
 const cloudinary = require("cloudinary").v2;
 const multer = require("multer");
 const upload = multer();
@@ -16,14 +14,12 @@ cloudinary.config({
   api_secret: process.env.API_SECRET,
 });
 //Get all Homeworks
-homeworkRouter.get("/", authorize, async (req, res, next) => {
+postRouter.get("/", authorize, async (req, res, next) => {
   try {
     const query = q2m(req.query);
 
-    const homework = await HomeworkSchema.find(
-      query.criteria,
-      query.options.fields
-    )
+    const post = await postModel
+      .find(query.criteria, query.options.fields)
       .populate("userId")
 
       .skip(query.options.skip)
@@ -33,14 +29,14 @@ homeworkRouter.get("/", authorize, async (req, res, next) => {
         dateOfCreation: -1,
       });
 
-    res.send(homework);
+    res.send(post);
   } catch (error) {
     console.log(error);
     next(error);
   }
 });
 //Post a new homework
-homeworkRouter.post(
+postRouter.post(
   "/add",
   authorize,
   tutorOnlyMiddleware,
@@ -48,14 +44,14 @@ homeworkRouter.post(
     try {
       const user = req.user._id;
       //when you do a post you add userId, to get user to homeworks
-      const newHomework = new HomeworkSchema({ ...req.body, userId: user });
+      const newPost = new postModel({ ...req.body, userId: user });
 
-      await newHomework.save();
+      await newPost.save();
 
       const attachUser = await userSchema.findByIdAndUpdate({ _id: user });
-      const homeworks = attachUser.homeworks;
-      console.log(homeworks);
-      homeworks.push(newHomework._id);
+      const posts = attachUser.posts;
+      console.log(posts);
+      posts.push(newPost._id);
       await attachUser.save({ validateBeforeSave: false });
       res.status(201).send(attachUser);
     } catch (error) {
@@ -64,10 +60,10 @@ homeworkRouter.post(
   }
 );
 //Get a single homework
-homeworkRouter.get("/:id", authorize, async (req, res, next) => {
+postRouter.get("/:id", authorize, async (req, res, next) => {
   try {
     const id = req.params.id;
-    const homework = await HomeworkSchema.findById(id);
+    const homework = await postModel.findById(id);
 
     if (homework) {
       res.send(homework);
@@ -83,13 +79,13 @@ homeworkRouter.get("/:id", authorize, async (req, res, next) => {
 });
 
 //Edit a single homework
-homeworkRouter.put(
+postRouter.put(
   "/:id",
   authorize,
   tutorOnlyMiddleware,
   async (req, res, next) => {
     try {
-      const homework = await HomeworkSchema.findByIdAndUpdate(
+      const homework = await postModel.findByIdAndUpdate(
         req.params.id,
         req.body
       );
@@ -111,13 +107,13 @@ homeworkRouter.put(
   }
 );
 //Delete a single Homework
-homeworkRouter.delete(
+postRouter.delete(
   "/:id",
   authorize,
   tutorOnlyMiddleware,
   async (req, res, next) => {
     try {
-      const homework = await HomeworkSchema.findByIdAndDelete(req.params.id);
+      const homework = await postModel.findByIdAndDelete(req.params.id);
       if (homework) {
         res.send(`homework with id ${req.params.id} is deleted succesfully.`);
       } else {
@@ -131,7 +127,7 @@ homeworkRouter.delete(
   }
 );
 
-homeworkRouter.post(
+postRouter.post(
   "/:id/uploadImage",
   authorize,
   upload.single("image"),
@@ -140,11 +136,11 @@ homeworkRouter.post(
       if (req.file) {
         const cloud_upload = cloudinary.uploader.upload_stream(
           {
-            folder: "E-TECH-HOMEWORKS",
+            folder: "E-TECH-POSTS",
           },
           async (err, data) => {
             if (!err) {
-              const post = await HomeworkSchema.findByIdAndUpdate({
+              const post = await postModel.findByIdAndUpdate({
                 _id: req.params.id,
               });
               post.homeworkPhotos = data.secure_url;
@@ -167,4 +163,4 @@ homeworkRouter.post(
     }
   }
 );
-module.exports = homeworkRouter;
+module.exports = postRouter;

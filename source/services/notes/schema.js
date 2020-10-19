@@ -2,11 +2,13 @@ const { Schema } = require("mongoose");
 const mongoose = require("mongoose");
 
 const noteSchema = new Schema({
-  noteTitle: { type: String, required: true },
-  noteDescription: { type: String, default: "Add a description here..." },
+  myTitle: { type: String, required: true },
+  description: { type: String, default: "Add a description here..." },
 
-  notePhoto: {
+  image: {
     type: String,
+    default:
+      "https://res.cloudinary.com/social4marketing/image/upload/v1603135846/E-TECH-NOTES/notes_j1wvx3.png",
   },
   userId: { type: Schema.Types.ObjectId, ref: "users" },
   dateOfCreation: { type: Date, default: Date.now },

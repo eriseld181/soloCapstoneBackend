@@ -2,10 +2,10 @@ const { Schema } = require("mongoose");
 const mongoose = require("mongoose");
 
 const projectSchema = new Schema({
-  projectName: { type: String, required: true },
-  projectDescription: { type: String, default: "" },
-  projectLink: { type: String, default: "" },
-  projectPhoto: {
+  myTitle: { type: String, required: true },
+  description: { type: String, default: "" },
+  link: { type: String, default: "" },
+  image: {
     type: String,
     default:
       "https://res.cloudinary.com/social4marketing/image/upload/v1602529806/E-TECH/projects_n7jnhy.png",

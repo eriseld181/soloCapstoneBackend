@@ -2,13 +2,13 @@ const { Schema } = require("mongoose");
 const mongoose = require("mongoose");
 
 const homeworkSchema = new Schema({
-  homework: { type: String, required: true },
+  myTitle: { type: String, required: true },
   description: { type: String, default: "" },
-  homeworkPhotos: [
-    {
-      type: String,
-    },
-  ],
+  image: {
+    type: String,
+    default:
+      "https://res.cloudinary.com/social4marketing/image/upload/v1603135582/E-TECH-HOMEWORKS/homeworks_pl1pad.png",
+  },
 
   userId: { type: Schema.Types.ObjectId, ref: "users" },
 });

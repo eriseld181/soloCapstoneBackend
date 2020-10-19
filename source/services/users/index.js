@@ -3,6 +3,7 @@ const q2m = require("query-to-mongo");
 
 const { authenticate, refreshToken1 } = require("./authentication");
 const UserModel = require("./schema");
+const projectModel = require("../projects/schema");
 const userRouter = express.Router();
 const { authorize, tutorOnlyMiddleware } = require("../middlewares/authorize");
 
@@ -45,22 +46,35 @@ userRouter.get("/me", authorize, async (req, res, next) => {
     next("While reading users list a problem occurred!");
   }
 });
-userRouter.get("/me/projects", authorize, async (req, res, next) => {
-  try {
-    const user = await UserModel.find({ _id: req.user._id }).populate(
-      "projects"
-    );
-    res.send(user);
-  } catch (error) {
-    next("While reading users list a problem occurred!");
-  }
-});
+// userRouter.get("/me/projects", authorize, async (req, res, next) => {
+//   try {
+//     const user = await UserModel.find({ userId: req.user._id }).populate(
+//       "projects"
+//     );
+//     if (req.user._id === user.userId) {
+//       res.send(user);
+//     } else {
+//       console.log(user);
+//     }
+//   } catch (error) {
+//     next("While reading users list a problem occurred!");
+//   }
+// });
 
 //Get single a Username
 userRouter.get("/:id", authorize, async (req, res, next) => {
   try {
     console.log(req.user);
     res.send(req.user);
+  } catch (error) {
+    next("While reading users list a problem occurred!");
+  }
+});
+userRouter.get("/me/projects", authorize, async (req, res, next) => {
+  try {
+    const projects = await projectModel.find({ userId: req.user._id });
+    console.log(projects);
+    res.send(projects);
   } catch (error) {
     next("While reading users list a problem occurred!");
   }

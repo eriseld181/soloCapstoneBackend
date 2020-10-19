@@ -5,6 +5,7 @@ const listEndPoints = require("express-list-endpoints");
 const mongoose = require("mongoose");
 const userRouter = require("./services/users");
 const HomeworkRouter = require("./services/homeworks");
+const postRouter = require("./services/posts");
 const projectRouter = require("./services/projects");
 const NotesRouter = require("./services/notes");
 const cookieParser = require("cookie-parser");
@@ -41,6 +42,7 @@ server.use("/api/users", userRouter);
 server.use("/api/projects", projectRouter);
 server.use("/api/homeworks", HomeworkRouter);
 server.use("/api/notes", NotesRouter);
+server.use("/api/posts", postRouter);
 
 //error handlers
 server.use(badRequest);
