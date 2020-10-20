@@ -4,6 +4,7 @@ const q2m = require("query-to-mongo");
 const { authenticate, refreshToken1 } = require("./authentication");
 const UserModel = require("./schema");
 const projectModel = require("../projects/schema");
+const postModel = require("../posts/schema");
 const userRouter = express.Router();
 const { authorize, tutorOnlyMiddleware } = require("../middlewares/authorize");
 
@@ -73,8 +74,19 @@ userRouter.get("/:id", authorize, async (req, res, next) => {
 userRouter.get("/me/projects", authorize, async (req, res, next) => {
   try {
     const projects = await projectModel.find({ userId: req.user._id });
-    console.log(projects);
+
     res.send(projects);
+  } catch (error) {
+    next("While reading users list a problem occurred!");
+  }
+});
+userRouter.get("/me/posts", authorize, async (req, res, next) => {
+  try {
+    const posts = await postModel
+      .find({ userId: req.user._id })
+      .populate("userId");
+    console.log("this is posts", posts);
+    res.send(posts);
   } catch (error) {
     next("While reading users list a problem occurred!");
   }
