@@ -153,24 +153,19 @@ userRouter.post("/register", async (req, res, next) => {
 userRouter.post("/login", async (req, res, next) => {
   try {
     const { email, password } = req.body;
-
     const user = await UserModel.findByCredentials(email, password);
-
     const token = await authenticate(user);
-
-    // console.log(token)
     res.cookie("accessToken", token.token, {
       // secure: true,
       // httpOnly: true,
       // sameSite: true,
     });
-
-    res.cookie("refreshToken", token.refreshToken, {
-      // httpOnly: true,
-      // secure: true,
-      // path: "/refreshToken",
-      // sameSite: true,
-    });
+    // res.cookie("refreshToken", token.refreshToken, {
+    //   // httpOnly: true,
+    //   // secure: true,
+    //   // path: "/refreshToken",
+    //   // sameSite: true,
+    // });
     res.send("ok");
   } catch (error) {
     next(error);
@@ -179,14 +174,16 @@ userRouter.post("/login", async (req, res, next) => {
 //logout from this platform...
 userRouter.post("/logout", authorize, async (req, res, next) => {
   try {
-    req.user.refreshTokens = req.user.refreshTokens.filter(
-      (t) => t.token !== req.token
-    );
+    // req.user.refreshTokens = req.user.refreshTokens.filter(
+    //   (t) => t.token !== req.token
+    // );
     console.log("req.user", req.user);
     await req.user.save();
-    const token = "";
-    res.cookie("token", token);
-    res.send("User is logged out");
+    // const token = "";
+    // res.cookie("token", token);
+    // res.send("User is logged out");
+    // res.clearCookie("accessToken");
+    // res.clearCookie("name", { path: "/" });
   } catch (err) {
     next(err);
   }
@@ -234,7 +231,7 @@ userRouter.post(
             if (!err) {
               req.user.profilePhoto = data.secure_url;
               await req.user.save({ validateBeforeSave: false });
-              res.status(201).send("image is added");
+              res.status(201).send("Image is uploaded");
             }
           }
         );
