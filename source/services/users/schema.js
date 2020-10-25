@@ -31,7 +31,7 @@ userSchema = new Schema(
     profilePhoto: {
       type: String,
       default:
-        "https://res.cloudinary.com/social4marketing/image/upload/v1602353297/E-TECH/defaultprofilephoto_f67v5k.png",
+        "https://res.cloudinary.com/social4marketing/image/upload/v1603450460/E-TECH/z42wvf5v7wjjt6bbwls2.png",
     },
     grades: { type: Number, default: 0, min: 0, max: 10 },
     registerdate: { type: Date, default: Date.now },

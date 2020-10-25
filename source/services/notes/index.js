@@ -122,12 +122,11 @@ noteRouter.post(
           },
           async (err, data) => {
             if (!err) {
-              const post = await noteSchema.findByIdAndUpdate({
+              await noteSchema.findOneAndUpdate({
                 _id: req.params.id,
+                image: data.secure_url,
               });
-              post.notePhoto = data.secure_url;
-              await post.save();
-              res.status(201).send("Image is added");
+              res.status(201).send("Note-Image is uploaded Sucessfully...");
             }
           }
         );

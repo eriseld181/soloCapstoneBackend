@@ -144,11 +144,10 @@ homeworkRouter.post(
           },
           async (err, data) => {
             if (!err) {
-              const post = await HomeworkSchema.findByIdAndUpdate({
+              await HomeworkSchema.findOneAndUpdate({
                 _id: req.params.id,
+                image: data.secure_url,
               });
-              post.homeworkPhotos = data.secure_url;
-              await post.save();
               res.status(201).send("Image is added");
             }
           }

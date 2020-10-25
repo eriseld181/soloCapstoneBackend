@@ -182,7 +182,8 @@ userRouter.post("/logout", authorize, async (req, res, next) => {
     // const token = "";
     // res.cookie("token", token);
     // res.send("User is logged out");
-    // res.clearCookie("accessToken");
+    res.clearCookie("accessToken");
+    res.send("cookie was deleted");
     // res.clearCookie("name", { path: "/" });
   } catch (err) {
     next(err);

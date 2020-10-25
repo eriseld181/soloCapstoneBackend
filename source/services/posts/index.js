@@ -140,12 +140,11 @@ postRouter.post(
           },
           async (err, data) => {
             if (!err) {
-              const post = await postModel.findByIdAndUpdate({
+              await postModel.findOneAndUpdate({
                 _id: req.params.id,
+                image: data.secure_url,
               });
-              post.homeworkPhotos = data.secure_url;
-              await post.save();
-              res.status(201).send("Image is added");
+              res.status(201).send("Post-Image is uploaded succesfully...");
             }
           }
         );
