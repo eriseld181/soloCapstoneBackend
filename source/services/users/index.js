@@ -156,16 +156,16 @@ userRouter.post("/login", async (req, res, next) => {
     const user = await UserModel.findByCredentials(email, password);
     const token = await authenticate(user);
     res.cookie("accessToken", token.token, {
-      // secure: true,
-      // httpOnly: true,
-      // sameSite: true,
+      secure: true,
+      httpOnly: true,
+      sameSite: true,
     });
-    // res.cookie("refreshToken", token.refreshToken, {
-    //   // httpOnly: true,
-    //   // secure: true,
-    //   // path: "/refreshToken",
-    //   // sameSite: true,
-    // });
+    res.cookie("refreshToken", token.refreshToken, {
+      httpOnly: true,
+      secure: true,
+      path: "/refreshToken",
+      sameSite: true,
+    });
     res.send("ok");
   } catch (error) {
     next(error);
@@ -179,12 +179,9 @@ userRouter.post("/logout", authorize, async (req, res, next) => {
     // );
     console.log("req.user", req.user);
     await req.user.save();
-    // const token = "";
-    // res.cookie("token", token);
-    // res.send("User is logged out");
+
     res.clearCookie("accessToken");
-    res.send("cookie was deleted");
-    // res.clearCookie("name", { path: "/" });
+    res.send("Logout was Sucessfully!");
   } catch (err) {
     next(err);
   }
@@ -201,11 +198,11 @@ userRouter.post("/refreshToken", async (req, res, next) => {
       const tokens = await refreshToken1(oldRefreshToken);
 
       res.cookie("accessToken", tokens.token, {
-        // httpOnly: true,
+        httpOnly: true,
       });
       res.cookie("refreshToken", tokens.refreshToken, {
-        // httpOnly: true,
-        // path: "/refreshToken",
+        httpOnly: true,
+        path: "/refreshToken",
       });
       res.send("ok");
     } catch (error) {
