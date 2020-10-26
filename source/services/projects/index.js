@@ -131,11 +131,12 @@ projectRouter.post(
           },
           async (err, data) => {
             if (!err) {
-              const post = await ProjectSchema.findOneAndUpdate({
+              await ProjectSchema.findOneAndUpdate({
                 _id: req.params.id,
                 image: data.secure_url,
               });
-              res.status(201).send("Image is added");
+
+              res.status(201).send("The project image is updated!");
             }
           }
         );

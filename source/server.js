@@ -53,11 +53,16 @@ server.use(generalError);
 
 console.log(listEndPoints(server));
 mongoose
-  .connect(process.env.CONNECTION_DATABASE, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useCreateIndex: true,
-  })
+  .connect(
+    process.env.CONNECTION_DATABASE,
+
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useCreateIndex: true,
+      useFindAndModify: false,
+    }
+  )
 
   .then(
     server.listen(port || 3000, () => {
