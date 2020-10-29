@@ -53,7 +53,7 @@ noteRouter.post("/add", authorize, async (req, res, next) => {
     const notes = attachUser.notes;
     notes.push(newNote._id);
     await attachUser.save({ validateBeforeSave: false });
-    res.status(201).send(attachUser);
+    res.status(201).send(newNote);
   } catch (error) {
     next(error);
   }

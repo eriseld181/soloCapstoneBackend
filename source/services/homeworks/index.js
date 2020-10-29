@@ -57,7 +57,7 @@ homeworkRouter.post(
       console.log(homeworks);
       homeworks.push(newHomework._id);
       await attachUser.save({ validateBeforeSave: false });
-      res.status(201).send(attachUser);
+      res.status(201).send(newHomework);
     } catch (error) {
       next(error);
     }
@@ -144,11 +144,15 @@ homeworkRouter.post(
           },
           async (err, data) => {
             if (!err) {
-              await HomeworkSchema.findOneAndUpdate({
+              const user = await HomeworkSchema.findOne({
                 _id: req.params.id,
-                image: data.secure_url,
               });
-              res.status(201).send("Image is added");
+              if (user) {
+                user.image = data.secure_url;
+                await user.save();
+              }
+
+              res.status(201).send("Homework-Image is added succesfully...");
             }
           }
         );

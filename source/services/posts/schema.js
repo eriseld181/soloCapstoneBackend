@@ -5,8 +5,8 @@ const postSchema = new Schema({
   myTitle: { type: String, required: true },
   image: {
     type: String,
-    default:
-      "https://res.cloudinary.com/social4marketing/image/upload/v1603135673/E-TECH-POSTS/publication_cijnwd.png",
+    // default:
+    //   "https://res.cloudinary.com/social4marketing/image/upload/v1603135673/E-TECH-POSTS/publication_cijnwd.png",
   },
   userId: { type: Schema.Types.ObjectId, ref: "users" },
 });

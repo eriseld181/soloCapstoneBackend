@@ -35,30 +35,25 @@ postRouter.get("/", authorize, async (req, res, next) => {
     next(error);
   }
 });
-//Post a new homework
-postRouter.post(
-  "/add",
-  authorize,
-  tutorOnlyMiddleware,
-  async (req, res, next) => {
-    try {
-      const user = req.user._id;
-      //when you do a post you add userId, to get user to homeworks
-      const newPost = new postModel({ ...req.body, userId: user });
+//Post a new post
+postRouter.post("/add", authorize, async (req, res, next) => {
+  try {
+    const user = req.user._id;
+    //when you do a post you add userId, to get user to homeworks
+    const newPost = new postModel({ ...req.body, userId: user });
 
-      await newPost.save();
+    await newPost.save();
 
-      const attachUser = await userSchema.findByIdAndUpdate({ _id: user });
-      const posts = attachUser.posts;
-      console.log(posts);
-      posts.push(newPost._id);
-      await attachUser.save({ validateBeforeSave: false });
-      res.status(201).send(attachUser);
-    } catch (error) {
-      next(error);
-    }
+    const attachUser = await userSchema.findByIdAndUpdate({ _id: user });
+    const posts = attachUser.posts;
+    console.log(posts);
+    posts.push(newPost._id);
+    await attachUser.save({ validateBeforeSave: false });
+    res.status(201).send(newPost);
+  } catch (error) {
+    next(error);
   }
-);
+});
 //Get a single homework
 postRouter.get("/:id", authorize, async (req, res, next) => {
   try {
@@ -82,7 +77,7 @@ postRouter.get("/:id", authorize, async (req, res, next) => {
 postRouter.put(
   "/:id",
   authorize,
-  tutorOnlyMiddleware,
+
   async (req, res, next) => {
     try {
       const homework = await postModel.findByIdAndUpdate(
@@ -140,10 +135,16 @@ postRouter.post(
           },
           async (err, data) => {
             if (!err) {
-              await postModel.findOneAndUpdate({
+              const user = await postModel.findOne({
+                // image: data.secure_url,
                 _id: req.params.id,
-                image: data.secure_url,
               });
+              if (user) {
+                user.image = data.secure_url;
+                await user.save();
+              }
+              console.log("beni", user);
+
               res.status(201).send("Post-Image is uploaded succesfully...");
             }
           }

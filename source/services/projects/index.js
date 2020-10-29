@@ -58,7 +58,7 @@ projectRouter.post("/add", authorize, async (req, res, next) => {
     const projects = attachUser.projects;
     projects.push(newProject._id);
     await attachUser.save({ validateBeforeSave: false });
-    res.status(201).send(attachUser);
+    res.status(201).send(newProject);
   } catch (error) {
     next(error);
   }
@@ -131,12 +131,15 @@ projectRouter.post(
           },
           async (err, data) => {
             if (!err) {
-              await ProjectSchema.findOneAndUpdate({
+              const user = await ProjectSchema.findOne({
                 _id: req.params.id,
-                image: data.secure_url,
               });
+              if (user) {
+                user.image = data.secure_url;
+                await user.save();
+              }
 
-              res.status(201).send("The project image is updated!");
+              res.status(201).send("Homework-Image is added succesfully...");
             }
           }
         );
