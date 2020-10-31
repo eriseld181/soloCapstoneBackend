@@ -13,7 +13,7 @@ cloudinary.config({
   api_key: process.env.API_KEY,
   api_secret: process.env.API_SECRET,
 });
-//Get all Homeworks
+//Get all posts
 postRouter.get("/", authorize, async (req, res, next) => {
   try {
     const query = q2m(req.query);

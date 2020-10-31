@@ -82,9 +82,14 @@ userRouter.get("/me/projects", authorize, async (req, res, next) => {
 });
 userRouter.get("/me/posts", authorize, async (req, res, next) => {
   try {
+    const query = q2m(req.query);
     const posts = await postModel
-      .find({ userId: req.user._id })
+      .find(query.criteria, query.options.fields, { userId: req.user._id })
+      .sort({
+        dateOfCreation: -1,
+      })
       .populate("userId");
+
     console.log("this is posts", posts);
     res.send(posts);
   } catch (error) {

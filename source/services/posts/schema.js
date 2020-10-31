@@ -1,15 +1,18 @@
 const { Schema } = require("mongoose");
 const mongoose = require("mongoose");
 
-const postSchema = new Schema({
-  myTitle: { type: String, required: true },
-  image: {
-    type: String,
-    // default:
-    //   "https://res.cloudinary.com/social4marketing/image/upload/v1603135673/E-TECH-POSTS/publication_cijnwd.png",
+const postSchema = new Schema(
+  {
+    myTitle: { type: String, required: true },
+    image: {
+      type: String,
+      // default:
+      //   "https://res.cloudinary.com/social4marketing/image/upload/v1603135673/E-TECH-POSTS/publication_cijnwd.png",
+    },
+    userId: { type: Schema.Types.ObjectId, ref: "users" },
   },
-  userId: { type: Schema.Types.ObjectId, ref: "users" },
-});
+  { timestamps: true }
+);
 postSchema.post("validate", function (error, doc, next) {
   if (error) {
     error.httpStatusCode = 400;

@@ -6,8 +6,8 @@ const homeworkSchema = new Schema({
   description: { type: String, default: "" },
   image: {
     type: String,
-    default:
-      "https://res.cloudinary.com/social4marketing/image/upload/v1603135582/E-TECH-HOMEWORKS/homeworks_pl1pad.png",
+    // default:
+    //   "https://res.cloudinary.com/social4marketing/image/upload/v1603135582/E-TECH-HOMEWORKS/homeworks_pl1pad.png",
   },
 
   userId: { type: Schema.Types.ObjectId, ref: "users" },

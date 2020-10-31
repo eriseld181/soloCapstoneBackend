@@ -7,8 +7,6 @@ const projectSchema = new Schema({
   link: { type: String, default: "" },
   image: {
     type: String,
-    default:
-      "https://res.cloudinary.com/social4marketing/image/upload/v1602529806/E-TECH/projects_n7jnhy.png",
   },
   userId: { type: Schema.Types.ObjectId, ref: "users" },
   dateOfCreation: { type: Date, default: Date.now },
