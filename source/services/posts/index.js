@@ -105,7 +105,7 @@ postRouter.put(
 postRouter.delete(
   "/:id",
   authorize,
-  tutorOnlyMiddleware,
+
   async (req, res, next) => {
     try {
       const homework = await postModel.findByIdAndDelete(req.params.id);

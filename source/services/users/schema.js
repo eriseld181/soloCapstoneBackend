@@ -41,11 +41,11 @@ userSchema = new Schema(
       required: true,
       default: "student",
     },
-    userPhoto: {
-      type: String,
-      default:
-        "https://toppng.com/uploads/preview/chf-project-blue-icon-quotes-11563133106x9u8mp8qop.png",
-    },
+    // userPhoto: {
+    //   type: String,
+    //   default:
+    //     "https://toppng.com/uploads/preview/chf-project-blue-icon-quotes-11563133106x9u8mp8qop.png",
+    // },
     projects: [{ type: Schema.Types.ObjectId, ref: "projects" }],
     homeworks: [{ type: Schema.Types.ObjectId, ref: "homeworks" }],
     notes: [{ type: Schema.Types.ObjectId, ref: "notes" }],

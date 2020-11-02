@@ -5,6 +5,8 @@ const { authenticate, refreshToken1 } = require("./authentication");
 const UserModel = require("./schema");
 const projectModel = require("../projects/schema");
 const postModel = require("../posts/schema");
+const noteModel = require("../notes/schema");
+const homeworkModel = require("../homeworks/schema");
 const userRouter = express.Router();
 const { authorize, tutorOnlyMiddleware } = require("../middlewares/authorize");
 
@@ -77,25 +79,44 @@ userRouter.get("/me/projects", authorize, async (req, res, next) => {
 
     res.send(projects);
   } catch (error) {
-    next("While reading users list a problem occurred!");
+    next("While reading project list a problem occurred!");
   }
 });
+
 userRouter.get("/me/posts", authorize, async (req, res, next) => {
   try {
-    const query = q2m(req.query);
     const posts = await postModel
-      .find(query.criteria, query.options.fields, { userId: req.user._id })
-      .sort({
-        dateOfCreation: -1,
-      })
+      .find({ userId: req.user._id })
       .populate("userId");
 
-    console.log("this is posts", posts);
     res.send(posts);
   } catch (error) {
-    next("While reading users list a problem occurred!");
+    next("While reading posts list a problem occurred!");
   }
 });
+userRouter.get("/me/notes", authorize, async (req, res, next) => {
+  try {
+    const posts = await noteModel
+      .find({ userId: req.user._id })
+      .populate("userId");
+
+    res.send(posts);
+  } catch (error) {
+    next("While reading notes list a problem occurred!");
+  }
+});
+userRouter.get("/me/homeworks", authorize, async (req, res, next) => {
+  try {
+    const posts = await homeworkModel
+      .find({ userId: req.user._id })
+      .populate("userId");
+
+    res.send(posts);
+  } catch (error) {
+    next("While reading homework list a problem occurred!");
+  }
+});
+
 //Edit a single person
 userRouter.put("/:id", authorize, async (req, res, next) => {
   console.log(req.user._id.equals(req.params.id));
