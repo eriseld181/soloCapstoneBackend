@@ -47,7 +47,7 @@ postRouter.post("/add", authorize, async (req, res, next) => {
 
     const attachUser = await userSchema.findByIdAndUpdate({ _id: user });
     const posts = attachUser.posts;
-    console.log(posts);
+
     posts.push(newPost._id);
     await attachUser.save({ validateBeforeSave: false });
     res.status(201).send(newPost);
@@ -144,7 +144,6 @@ postRouter.post(
                 user.image = data.secure_url;
                 await user.save();
               }
-              console.log("beni", user);
 
               res.status(201).send("Post-Image is uploaded succesfully...");
             }

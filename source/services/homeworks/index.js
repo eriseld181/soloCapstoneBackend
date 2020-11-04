@@ -54,7 +54,7 @@ homeworkRouter.post(
 
       const attachUser = await userSchema.findByIdAndUpdate({ _id: user });
       const homeworks = attachUser.homeworks;
-      console.log(homeworks);
+
       homeworks.push(newHomework._id);
       await attachUser.save({ validateBeforeSave: false });
       res.status(201).send(newHomework);

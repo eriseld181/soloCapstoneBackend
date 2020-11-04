@@ -46,8 +46,6 @@ projectRouter.get("/", authorize, async (req, res, next) => {
 //Post a new project
 projectRouter.post("/add", authorize, async (req, res, next) => {
   try {
-    console.log(req.user.id);
-
     const user = req.user._id;
     //when you do a post you add userId, to get user to project
     const newProject = new ProjectSchema({ ...req.body, userId: user });
@@ -68,8 +66,7 @@ projectRouter.get("/:id", authorize, async (req, res, next) => {
   try {
     const id = req.params.id;
     const project = await ProjectSchema.findById(id);
-    console.log(id);
-    console.log(project);
+
     if (project) {
       res.send(project);
     } else {

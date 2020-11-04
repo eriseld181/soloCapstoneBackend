@@ -43,7 +43,6 @@ userRouter.get("/", authorize, async (req, res, next) => {
 });
 userRouter.get("/me", authorize, async (req, res, next) => {
   try {
-    console.log(req.user);
     // res.cookie("active", "activeValue");
     res.send(req.user);
   } catch (error) {
@@ -68,7 +67,6 @@ userRouter.get("/me", authorize, async (req, res, next) => {
 //Get single a Username
 userRouter.get("/:id", authorize, async (req, res, next) => {
   try {
-    console.log(req.user);
     res.send(req.user);
   } catch (error) {
     next("While reading users list a problem occurred!");
@@ -120,8 +118,6 @@ userRouter.get("/me/homeworks", authorize, async (req, res, next) => {
 
 //Edit a single person
 userRouter.put("/:id", authorize, async (req, res, next) => {
-  console.log(req.user._id.equals(req.params.id));
-  console.log(req.params.id);
   if (req.user._id.equals(req.params.id)) {
     try {
       if (req.user.role !== "tutor" && req.body.role) {
@@ -206,7 +202,7 @@ userRouter.post("/logout", authorize, async (req, res, next) => {
     // req.user.refreshTokens = req.user.refreshTokens.filter(
     //   (t) => t.token !== req.token
     // );
-    console.log("req.user", req.user);
+
     await req.user.save();
 
     res.clearCookie("accessToken");
