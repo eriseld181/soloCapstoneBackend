@@ -28,6 +28,7 @@ postRouter.get("/", authorize, async (req, res, next) => {
       .sort({
         dateOfCreation: -1,
       });
+    // const data = await post.filter((item) => item._id != req.user.posts._id);
 
     res.send(post);
   } catch (error) {

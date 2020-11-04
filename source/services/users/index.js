@@ -44,6 +44,7 @@ userRouter.get("/", authorize, async (req, res, next) => {
 userRouter.get("/me", authorize, async (req, res, next) => {
   try {
     console.log(req.user);
+    // res.cookie("active", "activeValue");
     res.send(req.user);
   } catch (error) {
     next("While reading users list a problem occurred!");
@@ -192,6 +193,8 @@ userRouter.post("/login", async (req, res, next) => {
       // path: "/refreshToken",
       // sameSite: true,
     });
+    res.cookie("activeL", "activeValue");
+
     res.send("ok");
   } catch (error) {
     next(error);
@@ -207,6 +210,8 @@ userRouter.post("/logout", authorize, async (req, res, next) => {
     await req.user.save();
 
     res.clearCookie("accessToken");
+    res.clearCookie("refreshToken");
+    res.clearCookie("activeL");
     res.send("cookie was deleted");
     // res.clearCookie("name", { path: "/" });
   } catch (err) {
