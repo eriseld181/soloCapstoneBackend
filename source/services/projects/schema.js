@@ -1,17 +1,20 @@
 const { Schema } = require("mongoose");
 const mongoose = require("mongoose");
 
-const projectSchema = new Schema({
-  myTitle: { type: String, required: true },
-  description: { type: String, default: "" },
-  link: { type: String, default: "" },
-  image: {
-    type: String,
+const projectSchema = new Schema(
+  {
+    myTitle: { type: String, required: true },
+    description: { type: String, default: "" },
+    link: { type: String, default: "" },
+    image: {
+      type: String,
+    },
+    userId: { type: Schema.Types.ObjectId, ref: "users" },
+    dateOfCreation: { type: Date, default: Date.now },
+    dateOfEditing: { type: Date, default: Date.now },
   },
-  userId: { type: Schema.Types.ObjectId, ref: "users" },
-  dateOfCreation: { type: Date, default: Date.now },
-  dateOfEditing: { type: Date, default: Date.now },
-});
+  { timestamps: true }
+);
 projectSchema.post("validate", function (error, doc, next) {
   if (error) {
     error.httpStatusCode = 400;

@@ -30,7 +30,7 @@ homeworkRouter.get("/", authorize, async (req, res, next) => {
       .limit(query.options.limit)
 
       .sort({
-        dateOfCreation: -1,
+        createdAt: -1,
       });
 
     res.send(homework);

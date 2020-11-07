@@ -65,7 +65,9 @@ projectRouter.post("/add", authorize, async (req, res, next) => {
 projectRouter.get("/:id", authorize, async (req, res, next) => {
   try {
     const id = req.params.id;
-    const project = await ProjectSchema.findById(id);
+    const project = await ProjectSchema.findById(id).sort({
+      createdAt: -1,
+    });
 
     if (project) {
       res.send(project);

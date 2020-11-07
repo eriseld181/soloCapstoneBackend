@@ -74,7 +74,9 @@ userRouter.get("/:id", authorize, async (req, res, next) => {
 });
 userRouter.get("/me/projects", authorize, async (req, res, next) => {
   try {
-    const projects = await projectModel.find({ userId: req.user._id });
+    const projects = await projectModel.find({ userId: req.user._id }).sort({
+      createdAt: -1,
+    });
 
     res.send(projects);
   } catch (error) {
@@ -86,7 +88,10 @@ userRouter.get("/me/posts", authorize, async (req, res, next) => {
   try {
     const posts = await postModel
       .find({ userId: req.user._id })
-      .populate("userId");
+      .populate("userId")
+      .sort({
+        createdAt: -1,
+      });
 
     res.send(posts);
   } catch (error) {
@@ -97,7 +102,10 @@ userRouter.get("/me/notes", authorize, async (req, res, next) => {
   try {
     const posts = await noteModel
       .find({ userId: req.user._id })
-      .populate("userId");
+      .populate("userId")
+      .sort({
+        createdAt: -1,
+      });
 
     res.send(posts);
   } catch (error) {
@@ -108,7 +116,10 @@ userRouter.get("/me/homeworks", authorize, async (req, res, next) => {
   try {
     const posts = await homeworkModel
       .find({ userId: req.user._id })
-      .populate("userId");
+      .populate("userId")
+      .sort({
+        createdAt: -1,
+      });
 
     res.send(posts);
   } catch (error) {

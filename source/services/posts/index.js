@@ -1,4 +1,5 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const q2m = require("query-to-mongo");
 const userSchema = require("../users/schema");
 const postModel = require("./schema");
@@ -19,14 +20,15 @@ postRouter.get("/", authorize, async (req, res, next) => {
     const query = q2m(req.query);
 
     const post = await postModel
-      .find(query.criteria, query.options.fields)
+      .find(
+        { userId: { $ne: new mongoose.Types.ObjectId(req.user._id) } },
+        query.options.fields
+      )
       .populate("userId")
-
       .skip(query.options.skip)
       .limit(query.options.limit)
-
       .sort({
-        dateOfCreation: -1,
+        createdAt: -1,
       });
     // const data = await post.filter((item) => item._id != req.user.posts._id);
 

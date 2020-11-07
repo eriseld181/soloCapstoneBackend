@@ -1,17 +1,20 @@
 const { Schema } = require("mongoose");
 const mongoose = require("mongoose");
 
-const homeworkSchema = new Schema({
-  myTitle: { type: String, required: true },
-  description: { type: String, default: "" },
-  image: {
-    type: String,
-    // default:
-    //   "https://res.cloudinary.com/social4marketing/image/upload/v1603135582/E-TECH-HOMEWORKS/homeworks_pl1pad.png",
-  },
+const homeworkSchema = new Schema(
+  {
+    myTitle: { type: String, required: true },
+    description: { type: String, default: "" },
+    image: {
+      type: String,
+      // default:
+      //   "https://res.cloudinary.com/social4marketing/image/upload/v1603135582/E-TECH-HOMEWORKS/homeworks_pl1pad.png",
+    },
 
-  userId: { type: Schema.Types.ObjectId, ref: "users" },
-});
+    userId: { type: Schema.Types.ObjectId, ref: "users" },
+  },
+  { timestamps: true }
+);
 homeworkSchema.post("validate", function (error, doc, next) {
   if (error) {
     error.httpStatusCode = 400;
