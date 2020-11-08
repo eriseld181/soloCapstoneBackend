@@ -193,13 +193,13 @@ userRouter.post("/login", async (req, res, next) => {
     res.cookie("accessToken", token.token, {
       secure: true,
       httpOnly: true,
-      sameSite: true,
+      sameSite: "none",
     });
     res.cookie("refreshToken", token.refreshToken, {
       httpOnly: true,
       secure: true,
       path: "/refreshToken",
-      sameSite: true,
+      sameSite: "none",
     });
     res.cookie("activeL", "activeValue");
 
