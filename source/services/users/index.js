@@ -1,6 +1,6 @@
 const express = require("express");
 const q2m = require("query-to-mongo");
-const jwt = require("jsonwebtoken");
+
 const { authenticate, refreshToken1 } = require("./authentication");
 const UserModel = require("./schema");
 const projectModel = require("../projects/schema");

@@ -54,7 +54,7 @@ server.use(generalError);
 console.log(listEndPoints(server));
 mongoose
   .connect(
-    process.env.CONNECTION_DATABASE,
+    process.env.MONGODB_URI,
 
     {
       useNewUrlParser: true,
