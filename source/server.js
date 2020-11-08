@@ -43,7 +43,7 @@ server.use("/api/projects", projectRouter);
 server.use("/api/homeworks", HomeworkRouter);
 server.use("/api/notes", NotesRouter);
 server.use("/api/posts", postRouter);
-
+server.set("trust proxy", 1);
 //error handlers
 server.use(badRequest);
 server.use(notAuthorized);
