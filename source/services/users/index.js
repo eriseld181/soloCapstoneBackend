@@ -189,6 +189,7 @@ userRouter.post("/login", async (req, res, next) => {
     const { email, password } = req.body;
     const user = await UserModel.findByCredentials(email, password);
     const token = await authenticate(user);
+    console.log(token);
     res.cookie("accessToken", token.token, {
       secure: true,
       httpOnly: true,
@@ -238,6 +239,7 @@ userRouter.post("/refreshToken", async (req, res, next) => {
 
       res.cookie("accessToken", tokens.token, {
         httpOnly: true,
+        path: "/",
       });
       res.cookie("refreshToken", tokens.refreshToken, {
         httpOnly: true,
