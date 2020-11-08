@@ -19,7 +19,7 @@ const {
 } = require("../errorHandlers");
 
 const server = express();
-const whitelist = ["http://localhost:3000"];
+const whitelist = [process.env.Client_website];
 const corsOptions = {
   origin: (origin, callback) => {
     if (whitelist.indexOf(origin) !== -1 || !origin) {
