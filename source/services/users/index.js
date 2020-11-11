@@ -221,9 +221,21 @@ userRouter.post("/logout", authorize, async (req, res, next) => {
 
     await req.user.save();
 
-    res.clearCookie("accessToken");
-    res.clearCookie("refreshToken");
-    res.clearCookie("activeL");
+    res.clearCookie("accessToken", {
+      secure: true,
+      httpOnly: true,
+      sameSite: "none",
+    });
+    res.clearCookie("refreshToken", {
+      secure: true,
+      httpOnly: true,
+      sameSite: "none",
+    });
+    res.clearCookie("activeL", {
+      secure: true,
+      httpOnly: true,
+      sameSite: "none",
+    });
     res.send("cookie was deleted");
     // res.clearCookie("name", { path: "/" });
   } catch (err) {

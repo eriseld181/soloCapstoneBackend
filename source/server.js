@@ -22,8 +22,8 @@ const server = express();
 const whitelist = process.env.Client_website.split(",");
 const corsOptions = {
   origin: (origin, callback) => {
-    console.log(origin);
-    console.log(whitelist);
+    console.log("this is origin", origin);
+    console.log("this is white list", whitelist);
     if (whitelist.indexOf(origin) !== -1 || !origin) {
       callback(null, true);
     } else {
