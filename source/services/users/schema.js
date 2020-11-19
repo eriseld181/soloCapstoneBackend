@@ -24,6 +24,8 @@ userSchema = new Schema(
     headline: { type: String, default: "" },
     username: { type: String, default: "" },
     lastname: { type: String, required: true },
+    country: { type: String },
+    city: { type: String },
     github: { type: String, default: "https://github.com/" },
     linkedin: { type: String, default: "https://www.linkedin.com/in/" },
     portfolio: { type: String, default: "http://localhost:3000/profile" },
