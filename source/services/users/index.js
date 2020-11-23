@@ -41,6 +41,28 @@ userRouter.get("/", authorize, async (req, res, next) => {
     next(error);
   }
 });
+//get only students
+// userRouter.get("/students", authorize, async (req, res, next) => {
+//   if (req.user.role === "student") {
+//     try {
+//       const query = q2m(req.query);
+
+//       const users = await UserModel.find(query.criteria, query.options.fields)
+//         .populate("projects")
+//         .skip(query.options.skip)
+//         .limit(query.options.limit)
+//         .sort(query.options.sort);
+
+//       res.send({
+//         users,
+//         total: users.length,
+//       });
+//     } catch (error) {
+//       console.log(error);
+//       next(error);
+//     }
+//   }
+// });
 userRouter.get("/me", authorize, async (req, res, next) => {
   try {
     // res.cookie("active", "activeValue");
