@@ -19,12 +19,10 @@ const {
 } = require("../errorHandlers");
 
 const server = express();
-// const whitelist = process.env.Client_website || process.env.Local_client_url;
-const whitelist = process.env.Client_website;
+const whitelist = process.env.Client_website || process.env.Local_client_url;
+// const whitelist = process.env.Client_website;
 const corsOptions = {
   origin: (origin, callback) => {
-    console.log("this is origin", origin);
-    console.log("this is white list", whitelist);
     if (whitelist.indexOf(origin) !== -1 || !origin) {
       callback(null, true);
     } else {
