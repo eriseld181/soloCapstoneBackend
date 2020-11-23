@@ -20,7 +20,7 @@ const {
 
 const server = express();
 // const whitelist = process.env.Client_website || process.env.Local_client_url;
-const whitelist = process.env.Local_client_url;
+const whitelist = process.env.Client_website;
 const corsOptions = {
   origin: (origin, callback) => {
     console.log("this is origin", origin);
