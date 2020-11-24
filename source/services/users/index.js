@@ -199,20 +199,20 @@ userRouter.post("/login", async (req, res, next) => {
     const token = await authenticate(user);
     console.log(token);
     res.cookie("accessToken", token.token, {
-      // secure: true,
-      // httpOnly: true,
-      // sameSite: "none",
+      secure: true,
+      httpOnly: true,
+      sameSite: "none",
     });
     res.cookie("refreshToken", token.refreshToken, {
-      // httpOnly: true,
-      // secure: true,
-      // path: "/refreshToken",
-      // sameSite: "none",
+      httpOnly: true,
+      secure: true,
+      path: "/refreshToken",
+      sameSite: "none",
     });
     res.cookie("activeL", "activeValue", {
-      // secure: true,
-      // httpOnly: true,
-      // sameSite: "none",
+      secure: true,
+      httpOnly: true,
+      sameSite: "none",
     });
 
     res.send("ok");
@@ -230,19 +230,19 @@ userRouter.post("/logout", authorize, async (req, res, next) => {
     await req.user.save();
 
     res.clearCookie("accessToken", {
-      // secure: true,
-      // httpOnly: true,
-      // sameSite: "none",
+      secure: true,
+      httpOnly: true,
+      sameSite: "none",
     });
     res.clearCookie("refreshToken", {
-      // secure: true,
-      // httpOnly: true,
-      // sameSite: "none",
+      secure: true,
+      httpOnly: true,
+      sameSite: "none",
     });
     res.clearCookie("activeL", {
-      // secure: true,
-      // httpOnly: true,
-      // sameSite: "none",
+      secure: true,
+      httpOnly: true,
+      sameSite: "none",
     });
     res.send("cookie was deleted");
     // res.clearCookie("name", { path: "/" });
